@@ -2,6 +2,8 @@ package com.aniket.placementcell.entity;
 
 import com.aniket.placementcell.enums.Role;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,6 +16,7 @@ public class User {
     private String username; // Use email as username
 
     private String password;
+    @Enumerated(EnumType.STRING)
     private Role role;
 
 

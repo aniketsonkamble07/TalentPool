@@ -62,10 +62,10 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) // <--- Disable CSRF to allow POST without token
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/pvg/login",
+                                "/auth/login",
                                 "/home",
-                                "/pvg/student/register",
-                                "/pvg/student/home",
+                                "/student/register",
+
                                 "/pvg/student/job/{id}",
                                 "/officer/registerOfficer",
                                 "/jobs/add",
@@ -79,7 +79,9 @@ public class SecurityConfig {
                                 "/static/**"
                         ).permitAll()
                         .anyRequest().authenticated())
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

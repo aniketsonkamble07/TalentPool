@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Registration</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .step-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+        .step-indicator::before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: #dee2e6;
+            z-index: 1;
+        }
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+        .step-circle {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: #dee2e6;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        .step.active .step-circle {
+            background-color: #0d6efd;
+            color: white;
+        }
+        .step.completed .step-circle {
+            background-color: #198754;
+            color: white;
+        }
+        .step-label {
+            font-size: 0.875rem;
+            color: #6c757d;
+        }
+        .step.active .step-label {
+            color: #0d6efd;
+            font-weight: bold;
+        }
+        .step.completed .step-label {
+            color: #198754;
+        }
+        .form-step {
+            display: none;
+        }
+        .form-step.active {
+            display: block;
+        }
+        .form-navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+        }
+        .error-message {
+            color: #dc3545;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+        .form-header {
+            border-bottom: 1px solid #dee2e6;
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .marks-container {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .marks-container .form-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        .form-check-label {
+            margin-right: 1rem;
+        }
+        @media (max-width: 768px) {
+            .marks-container {
+                flex-direction: column;
+                gap: 0;
+            }
+            .marks-container .form-group {
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="h4 mb-0">Student Registration</h2>
+                </div>
+                <div class="card-body p-4">
+                    <!-- Step Indicator -->
+                    <div class="step-indicator">
+                        <div class="step active" id="step1-indicator">
+                            <div class="step-circle">1</div>
+                            <span class="step-label">Basic Info</span>
+                        </div>
+                        <div class="step" id="step2-indicator">
+                            <div class="step-circle">2</div>
+                            <span class="step-label">Academic Details</span>
+                        </div>
+                        <div class="step" id="step3-indicator">
+                            <div class="step-circle">3</div>
+                            <span class="step-label">Placement Info</span>
+                        </div>
+                    </div>
+
+
+                    <form th:action="@{/student/register}" th:object="${studentRequestDTO}" method="post" id="studentRegistrationForm">
+
+                        <!-- Step 1: Basic Information -->
+                        <div class="form-step active" id="step1">
+                            <div class="form-header">
+                                <h3 class="h5">Basic Information</h3>
+                                <p class="text-muted">Provide your personal and contact details.</p>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="crnNumber" class="form-label">CRN Number <span class="text-danger">*</span></label>
+                                    <input type="number" class="form-control" id="crnNumber" th:field="*{crnNumber}"
+                                           placeholder="Enter CRN number">
+                                    <div class="error-message" th:if="${#fields.hasErrors('crnNumber')}" th:errors="*{crnNumber}"></div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="name" class="form-label">Full Name <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="name" th:field="*{name}"
+                                           placeholder="Enter your full name">
+                                    <div class="error-message" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
+                                    <input type="email" class="form-control" id="email" th:field="*{email}"
+                                           placeholder="Enter your email">
+                                    <div class="error-message" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="password" class="form-label">Password <span class="text-danger">*</span></label>
+                                    <input type="password" class="form-control" id="password" th:field="*{password}"
+                                           placeholder="Enter password (min 6 characters)">
+                                    <div class="error-message" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="mobileNumber" class="form-label">Mobile Number <span class="text-danger">*</span></label>
+                                    <input type="tel" class="form-control" id="mobileNumber" th:field="*{mobileNumber}"
+                                           placeholder="Enter 10-digit mobile number">
+                                    <div class="error-message" th:if="${#fields.hasErrors('mobileNumber')}" th:errors="*{mobileNumber}"></div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="gender" class="form-label">Gender</label>
+                                    <select class="form-select" id="gender" th:field="*{gender}">
+                                        <option value="">Select Gender</option>
+                                        <option th:each="gender : ${T(com.aniket.placementcell.enums.Gender).values()}"
+                                                th:value="${gender}" th:text="${gender}"></option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Step 2: Academic Details -->
+                        <div class="form-step" id="step2">
+                            <div class="form-header">
+                                <h3 class="h5">Academic Details</h3>
+                                <p class="text-muted">Provide your academic information and marks.</p>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="branch" class="form-label">Branch <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="branch" th:field="*{branch}">
+                                        <option value="">Select Branch</option>
+                                        <option th:each="branch : ${T(com.aniket.placementcell.enums.Branch).values()}"
+                                                th:value="${branch}" th:text="${branch}"></option>
+                                    </select>
+                                    <div class="error-message" th:if="${#fields.hasErrors('branch')}" th:errors="*{branch}"></div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="year" class="form-label">Current Year <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="year" th:field="*{year}">
+                                        <option value="">Select Year</option>
+                                        <option th:each="year : ${T(com.aniket.placementcell.enums.StudentYear).values()}"
+                                                th:value="${year}" th:text="${year}"></option>
+                                    </select>
+                                    <div class="error-message" th:if="${#fields.hasErrors('year')}" th:errors="*{year}"></div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="passingYear" class="form-label">Passing Year <span class="text-danger">*</span></label>
+                                    <input type="number" class="form-control" id="passingYear" th:field="*{passingYear}"
+                                           min="2000" max="2030" placeholder="e.g. 2024">
+                                    <div class="error-message" th:if="${#fields.hasErrors('passingYear')}" th:errors="*{passingYear}"></div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="cgpa" class="form-label">CGPA</label>
+                                    <input type="number" class="form-control" id="cgpa" th:field="*{cgpa}"
+                                           min="0.0" max="10.0" step="0.1" placeholder="e.g. 8.5">
+                                    <div class="error-message" th:if="${#fields.hasErrors('cgpa')}" th:errors="*{cgpa}"></div>
+                                </div>
+                            </div>
+
+                            <div class="marks-container mb-3">
+                                <div class="form-group">
+                                    <label for="mark10th" class="form-label">10th Marks (%)</label>
+                                    <input type="number" class="form-control" id="mark10th" th:field="*{mark10th}"
+                                           min="0.0" max="100.0" step="0.1" placeholder="e.g. 85.5">
+                                    <div class="error-message" th:if="${#fields.hasErrors('mark10th')}" th:errors="*{mark10th}"></div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="mark12th" class="form-label">12th Marks (%)</label>
+                                    <input type="number" class="form-control" id="mark12th" th:field="*{mark12th}"
+                                           min="0.0" max="100.0" step="0.1" placeholder="e.g. 82.0">
+                                    <div class="error-message" th:if="${#fields.hasErrors('mark12th')}" th:errors="*{mark12th}"></div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="diplomaMarks" class="form-label">Diploma Marks (%)</label>
+                                    <input type="number" class="form-control" id="diplomaMarks" th:field="*{diplomaMarks}"
+                                           min="0.0" max="100.0" step="0.1" placeholder="e.g. 78.5">
+                                    <div class="error-message" th:if="${#fields.hasErrors('diplomaMarks')}" th:errors="*{diplomaMarks}"></div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="aggregateMarks" class="form-label">Aggregate Marks (%)</label>
+                                    <input type="number" class="form-control" id="aggregateMarks" th:field="*{aggregateMarks}"
+                                           min="0.0" max="100.0" step="0.1" placeholder="e.g. 80.0">
+                                    <div class="error-message" th:if="${#fields.hasErrors('aggregateMarks')}" th:errors="*{aggregateMarks}"></div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="activeBacklog" class="form-label">Active Backlogs</label>
+                                    <input type="number" class="form-control" id="activeBacklog" th:field="*{activeBacklog}"
+                                           min="0" placeholder="e.g. 0">
+                                    <div class="error-message" th:if="${#fields.hasErrors('activeBacklog')}" th:errors="*{activeBacklog}"></div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="form-check mt-4">
+                                        <input class="form-check-input" type="checkbox" id="yearDown" th:field="*{yearDown}">
+                                        <label class="form-check-label" for="yearDown">
+                                            Year Down
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Step 3: Placement Information -->
+                        <div class="form-step" id="step3">
+                            <div class="form-header">
+                                <h3 class="h5">Placement Information</h3>
+                                <p class="text-muted">Provide your placement status and details.</p>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="placementStatus" class="form-label">Placement Status <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="placementStatus" th:field="*{placementStatus}">
+                                        <option value="">Select Placement Status</option>
+                                        <option th:each="status : ${T(com.aniket.placementcell.enums.PlacementStatus).values()}"
+                                                th:value="${status}" th:text="${status}"></option>
+                                    </select>
+                                    <div class="error-message" th:if="${#fields.hasErrors('placementStatus')}" th:errors="*{placementStatus}"></div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="companyName" class="form-label">Company Name</label>
+                                    <input type="text" class="form-control" id="companyName" th:field="*{companyName}"
+                                           placeholder="Enter company name if placed">
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="salary" class="form-label">Salary (LPA)</label>
+                                    <input type="number" class="form-control" id="salary" th:field="*{salary}"
+                                           min="0" step="0.01" placeholder="e.g. 8.5">
+                                    <div class="error-message" th:if="${#fields.hasErrors('salary')}" th:errors="*{salary}"></div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="remarks" class="form-label">Remarks</label>
+                                <textarea class="form-control" id="remarks" th:field="*{remarks}"
+                                          rows="3" placeholder="Any additional remarks (max 500 characters)"></textarea>
+                                <div class="form-text"><span id="remarksCount">0</span>/500 characters</div>
+                                <div class="error-message" th:if="${#fields.hasErrors('remarks')}" th:errors="*{remarks}"></div>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="confirmDetails">
+                                    <label class="form-check-label" for="confirmDetails">
+                                        I confirm that all the information provided is accurate
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Form Navigation -->
+                        <div class="form-navigation">
+                            <button type="button" class="btn btn-outline-secondary" id="prevBtn" disabled>Previous</button>
+                            <button type="button" class="btn btn-primary" id="nextBtn">Next</button>
+                            <button type="submit" class="btn btn-success" id="submitBtn" style="display: none;">Register Student</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        let currentStep = 1;
+        const totalSteps = 3;
+
+        // DOM Elements
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const submitBtn = document.getElementById('submitBtn');
+        const remarksTextarea = document.getElementById('remarks');
+        const remarksCount = document.getElementById('remarksCount');
+
+        // Check if required elements exist
+        if (!prevBtn || !nextBtn || !submitBtn) {
+            console.error('Required navigation buttons not found');
+            return;
+        }
+
+        // Update form steps
+        function updateFormSteps() {
+            // Hide all steps
+            const formSteps = document.querySelectorAll('.form-step');
+            if (formSteps.length === 0) {
+                console.error('No form steps found');
+                return;
+            }
+
+            formSteps.forEach(step => {
+                step.classList.remove('active');
+            });
+
+            // Show current step
+            const currentStepElement = document.getElementById(`step${currentStep}`);
+            if (currentStepElement) {
+                currentStepElement.classList.add('active');
+            }
+
+            // Update step indicators
+            const stepIndicators = document.querySelectorAll('.step');
+            stepIndicators.forEach((step, index) => {
+                if (index + 1 < currentStep) {
+                    step.classList.remove('active');
+                    step.classList.add('completed');
+                } else if (index + 1 === currentStep) {
+                    step.classList.add('active');
+                    step.classList.remove('completed');
+                } else {
+                    step.classList.remove('active', 'completed');
+                }
+            });
+
+            // Update navigation buttons
+            prevBtn.disabled = currentStep === 1;
+            nextBtn.style.display = currentStep < totalSteps ? 'block' : 'none';
+            submitBtn.style.display = currentStep === totalSteps ? 'block' : 'none';
+        }
+
+        // Next button click
+        nextBtn.addEventListener('click', function() {
+            if (validateStep(currentStep)) {
+                currentStep++;
+                updateFormSteps();
+            }
+        });
+
+        // Previous button click
+        prevBtn.addEventListener('click', function() {
+            currentStep--;
+            updateFormSteps();
+        });
+
+        // Remarks character counter
+        if (remarksTextarea && remarksCount) {
+            remarksTextarea.addEventListener('input', function() {
+                const length = this.value.length;
+                remarksCount.textContent = length;
+                if (length > 500) {
+                    remarksCount.style.color = '#dc3545';
+                } else {
+                    remarksCount.style.color = '#6c757d';
+                }
+            });
+        }
+
+        // Simple step validation
+        function validateStep(step) {
+            let isValid = true;
+
+            // Clear previous errors
+            clearFieldErrors();
+
+            // Add validation logic for each step here
+            if (step === 1) {
+                const crnNumber = document.getElementById('crnNumber');
+                const name = document.getElementById('name');
+                const email = document.getElementById('email');
+                const password = document.getElementById('password');
+                const mobileNumber = document.getElementById('mobileNumber');
+
+                if (crnNumber && !crnNumber.value.trim()) {
+                    isValid = false;
+                    showFieldError('crnNumber', 'CRN number is required');
+                }
+
+                if (name && !name.value.trim()) {
+                    isValid = false;
+                    showFieldError('name', 'Name is required');
+                }
+
+                if (email && !email.value.trim()) {
+                    isValid = false;
+                    showFieldError('email', 'Email is required');
+                } else if (email && !isValidEmail(email.value)) {
+                    isValid = false;
+                    showFieldError('email', 'Please enter a valid email address');
+                }
+
+                if (password && !password.value.trim()) {
+                    isValid = false;
+                    showFieldError('password', 'Password is required');
+                } else if (password && password.value.length < 6) {
+                    isValid = false;
+                    showFieldError('password', 'Password must be at least 6 characters long');
+                }
+
+                if (mobileNumber && !mobileNumber.value.trim()) {
+                    isValid = false;
+                    showFieldError('mobileNumber', 'Mobile number is required');
+                } else if (mobileNumber && !isValidMobileNumber(mobileNumber.value)) {
+                    isValid = false;
+                    showFieldError('mobileNumber', 'Mobile number must be 10 to 15 digits');
+                }
+            }
+
+            if (step === 2) {
+                const branch = document.getElementById('branch');
+                const year = document.getElementById('year');
+                const passingYear = document.getElementById('passingYear');
+
+                if (branch && !branch.value) {
+                    isValid = false;
+                    showFieldError('branch', 'Branch is required');
+                }
+
+                if (year && !year.value) {
+                    isValid = false;
+                    showFieldError('year', 'Current year is required');
+                }
+
+                if (passingYear && !passingYear.value) {
+                    isValid = false;
+                    showFieldError('passingYear', 'Passing year is required');
+                } else if (passingYear && (passingYear.value < 2000 || passingYear.value > 2030)) {
+                    isValid = false;
+                    showFieldError('passingYear', 'Passing year must be between 2000 and 2030');
+                }
+
+                // Validate marks ranges
+                const mark10th = document.getElementById('mark10th');
+                const mark12th = document.getElementById('mark12th');
+                const diplomaMarks = document.getElementById('diplomaMarks');
+                const aggregateMarks = document.getElementById('aggregateMarks');
+                const cgpa = document.getElementById('cgpa');
+
+                if (mark10th && mark10th.value && (mark10th.value < 0 || mark10th.value > 100)) {
+                    isValid = false;
+                    showFieldError('mark10th', '10th marks must be between 0 and 100');
+                }
+
+                if (mark12th && mark12th.value && (mark12th.value < 0 || mark12th.value > 100)) {
+                    isValid = false;
+                    showFieldError('mark12th', '12th marks must be between 0 and 100');
+                }
+
+                if (diplomaMarks && diplomaMarks.value && (diplomaMarks.value < 0 || diplomaMarks.value > 100)) {
+                    isValid = false;
+                    showFieldError('diplomaMarks', 'Diploma marks must be between 0 and 100');
+                }
+
+                if (aggregateMarks && aggregateMarks.value && (aggregateMarks.value < 0 || aggregateMarks.value > 100)) {
+                    isValid = false;
+                    showFieldError('aggregateMarks', 'Aggregate marks must be between 0 and 100');
+                }
+
+                if (cgpa && cgpa.value && (cgpa.value < 0 || cgpa.value > 10)) {
+                    isValid = false;
+                    showFieldError('cgpa', 'CGPA must be between 0.0 and 10.0');
+                }
+            }
+
+            if (step === 3) {
+                const placementStatus = document.getElementById('placementStatus');
+                const confirmDetails = document.getElementById('confirmDetails');
+
+                if (placementStatus && !placementStatus.value) {
+                    isValid = false;
+                    showFieldError('placementStatus', 'Placement status is required');
+                }
+
+                if (confirmDetails && !confirmDetails.checked) {
+                    isValid = false;
+                    showFieldError('confirmDetails', 'Please confirm that all information is accurate');
+                }
+
+                // Validate remarks length
+                const remarks = document.getElementById('remarks');
+                if (remarks && remarks.value.length > 500) {
+                    isValid = false;
+                    showFieldError('remarks', 'Remarks cannot exceed 500 characters');
+                }
+            }
+
+            return isValid;
+        }
+
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        function isValidMobileNumber(mobile) {
+            const mobileRegex = /^\d{10,15}$/;
+            return mobileRegex.test(mobile);
+        }
+
+        function showFieldError(fieldId, message) {
+            const field = document.getElementById(fieldId);
+            if (!field) {
+                console.error(`Field with id ${fieldId} not found`);
+                return;
+            }
+
+            let errorElement = field.parentNode.querySelector('.error-message:not([th\\:if])');
+
+            if (!errorElement) {
+                errorElement = document.createElement('div');
+                errorElement.className = 'error-message';
+                field.parentNode.appendChild(errorElement);
+            }
+
+            errorElement.textContent = message;
+            field.classList.add('is-invalid');
+
+            // Scroll to the first error
+            const firstInvalidField = document.querySelector('.is-invalid');
+            if (firstInvalidField === field) {
+                field.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+        function clearFieldErrors() {
+            // Remove custom error messages (only those without th:if attribute)
+            const errorMessages = document.querySelectorAll('.error-message:not([th\\:if])');
+            errorMessages.forEach(error => {
+                error.remove();
+            });
+
+            // Remove invalid class from fields
+            const invalidFields = document.querySelectorAll('.is-invalid');
+            invalidFields.forEach(field => {
+                field.classList.remove('is-invalid');
+            });
+        }
+
+        // Initialize the form
+        updateFormSteps();
+    });
+</script>
+</body>
+</html>

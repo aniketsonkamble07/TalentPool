@@ -6,6 +6,8 @@ import com.aniket.placementcell.enums.PlacementStatus;
 import com.aniket.placementcell.enums.StudentYear;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -17,6 +19,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@EntityListeners(AuditingEntityListener.class)
 public class Student {
 
     @Id
@@ -28,8 +31,6 @@ public class Student {
 
     @Column(unique = true, nullable = false)
     private String email;
-
-
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -80,12 +81,16 @@ public class Student {
 
     private Double salary;
 
-    @Column(name = "register_time")
-    private LocalDateTime registerTime = LocalDateTime.now();
+    @CreatedDate
+    @Column(name = "register_time", updatable = false)
+    private LocalDateTime registerTime;
+
+
+
+
     @OneToOne
     @JoinColumn(name = "username", referencedColumnName = "username")
     private User user;
     @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<AppliedJob> appliedList;
-
 }
