@@ -28,18 +28,18 @@ public class StudentRegistrationService {
     {
         if(studentRepository.existsByEmail(dto.getEmail()))
         {
-              return new ApiResponse(false, "Username already present",dto.getEmail());
+              return new ApiResponse(false, "Username already present",dto.getEmail(),null);
         }
 
         if(studentRepository.existsByCrnNumber(dto.getCrnNumber()))
         {
-            return new ApiResponse(false,"Username already present",dto.getCrnNumber().toString());
+            return new ApiResponse(false,"Username already present",dto.getCrnNumber().toString(),null);
         }
 
         User user = new User();
         user.setUsername(dto.getEmail());
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
-        user.setRole(Role.Student);
+        user.setRole(Role.STUDENT);
         userRepository.save(user);
         System.out.println("[DEBUG] User account created for: " + user.getUsername());
 

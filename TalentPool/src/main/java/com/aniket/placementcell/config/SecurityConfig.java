@@ -65,10 +65,7 @@ public class SecurityConfig {
                                 "/auth/login",
                                 "/home",
                                 "/student/register",
-
-                                "/pvg/student/job/{id}",
-                                "/officer/registerOfficer",
-                                "/jobs/add",
+                                "/jobs/addPost",
                                 // Static resources
                                 "/css/**",
                                 "/js/**",
@@ -78,6 +75,9 @@ public class SecurityConfig {
                                 "/error",
                                 "/static/**"
                         ).permitAll()
+                        .requestMatchers("/student/job/{id}",
+                                "/student/home").hasRole("STUDENT")
+                        .requestMatchers("/admin/registerOfficer").hasRole("PLACEMENT_OFFICER")
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)

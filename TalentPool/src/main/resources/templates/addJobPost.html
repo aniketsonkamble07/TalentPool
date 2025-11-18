@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Job Posting</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .step-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+        .step-indicator::before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: #dee2e6;
+            z-index: 1;
+        }
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+        .step-circle {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: #dee2e6;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        .step.active .step-circle {
+            background-color: #0d6efd;
+            color: white;
+        }
+        .step.completed .step-circle {
+            background-color: #198754;
+            color: white;
+        }
+        .step-label {
+            font-size: 0.875rem;
+            color: #6c757d;
+        }
+        .step.active .step-label {
+            color: #0d6efd;
+            font-weight: bold;
+        }
+        .step.completed .step-label {
+            color: #198754;
+        }
+        .form-step {
+            display: none;
+        }
+        .form-step.active {
+            display: block;
+        }
+        .form-navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+        }
+        .error-message {
+            color: #dc3545;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+        .form-header {
+            border-bottom: 1px solid #dee2e6;
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .salary-range-container {
+            display: flex;
+            gap: 1rem;
+        }
+        .salary-range-container .form-group {
+            flex: 1;
+        }
+        @media (max-width: 768px) {
+            .salary-range-container {
+                flex-direction: column;
+                gap: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="h4 mb-0">Create Job Posting</h2>
+                </div>
+                <div class="card-body p-4">
+                    <!-- Step Indicator -->
+                    <div class="step-indicator">
+                        <div class="step active" id="step1-indicator">
+                            <div class="step-circle">1</div>
+                            <span class="step-label">Basic Info</span>
+                        </div>
+                        <div class="step" id="step2-indicator">
+                            <div class="step-circle">2</div>
+                            <span class="step-label">Job Details</span>
+                        </div>
+                        <div class="step" id="step3-indicator">
+                            <div class="step-circle">3</div>
+                            <span class="step-label">Requirements</span>
+                        </div>
+                        <div class="step" id="step4-indicator">
+                            <div class="step-circle">4</div>
+                            <span class="step-label">Drive Info</span>
+                        </div>
+                    </div>
+
+                    <form th:action="@{/jobs/addPost}" th:object="${jobPostingRequestDTO}" method="post" id="jobPostingForm">
+                        <!-- Step 1: Basic Information -->
+                        <div class="form-step active" id="step1">
+                            <div class="form-header">
+                                <h3 class="h5">Basic Information</h3>
+                                <p class="text-muted">Provide the basic details about the job and company.</p>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="title" class="form-label">Job Title <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="title" th:field="*{title}"
+                                           placeholder="e.g. Software Engineer">
+                                    <div class="error-message" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="jobId" class="form-label">Job ID <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="jobId" th:field="*{jobId}"
+                                           placeholder="e.g. JOB-001">
+                                    <div class="error-message" th:if="${#fields.hasErrors('jobId')}" th:errors="*{jobId}"></div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="companyName" class="form-label">Company Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="companyName" th:field="*{companyName}"
+                                       placeholder="Enter company name">
+                                <div class="error-message" th:if="${#fields.hasErrors('companyName')}" th:errors="*{companyName}"></div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="description" class="form-label">Job Description</label>
+                                <textarea class="form-control" id="description" th:field="*{description}"
+                                          rows="4" placeholder="Describe the role, responsibilities, and expectations"></textarea>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="jobType" class="form-label">Job Type <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="jobType" th:field="*{jobType}">
+                                        <option value="">Select Job Type</option>
+                                        <option th:each="type : ${T(com.aniket.placementcell.enums.JobType).values()}"
+                                                th:value="${type}" th:text="${type}"></option>
+                                    </select>
+                                    <div class="error-message" th:if="${#fields.hasErrors('jobType')}" th:errors="*{jobType}"></div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="employmentType" class="form-label">Employment Type <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="employmentType" th:field="*{employmentType}">
+                                        <option value="">Select Employment Type</option>
+                                        <option th:each="type : ${T(com.aniket.placementcell.enums.EmploymentType).values()}"
+                                                th:value="${type}" th:text="${type}"></option>
+                                    </select>
+                                    <div class="error-message" th:if="${#fields.hasErrors('employmentType')}" th:errors="*{employmentType}"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Step 2: Job Details -->
+                        <div class="form-step" id="step2">
+                            <div class="form-header">
+                                <h3 class="h5">Job Details</h3>
+                                <p class="text-muted">Provide location, salary, and status information.</p>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="location" class="form-label">Location <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="location" th:field="*{location}"
+                                       placeholder="e.g. New York, NY or Remote">
+                                <div class="error-message" th:if="${#fields.hasErrors('location')}" th:errors="*{location}"></div>
+                            </div>
+
+                            <div class="salary-range-container mb-3">
+                                <div class="form-group">
+                                    <label for="minSalary" class="form-label">Minimum Salary</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input type="number" class="form-control" id="minSalary" th:field="*{minSalary}"
+                                               min="0" step="0.01" placeholder="0.00">
+                                    </div>
+                                    <div class="error-message" th:if="${#fields.hasErrors('minSalary')}" th:errors="*{minSalary}"></div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="maxSalary" class="form-label">Maximum Salary</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input type="number" class="form-control" id="maxSalary" th:field="*{maxSalary}"
+                                               min="0" step="0.01" placeholder="0.00">
+                                    </div>
+                                    <div class="error-message" th:if="${#fields.hasErrors('maxSalary')}" th:errors="*{maxSalary}"></div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="salaryType" class="form-label">Salary Type <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="salaryType" th:field="*{salaryType}">
+                                        <option value="">Select Salary Type</option>
+                                        <option value="PER_ANNUM">Per Annum</option>
+                                        <option value="PER_MONTH">Per Month</option>
+                                        <option value="PER_HOUR">Per Hour</option>
+                                    </select>
+                                    <div class="error-message" th:if="${#fields.hasErrors('salaryType')}" th:errors="*{salaryType}"></div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="status" class="form-label">Job Status <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="status" th:field="*{status}">
+                                        <option value="">Select Status</option>
+                                        <option th:each="status : ${T(com.aniket.placementcell.enums.JobStatus).values()}"
+                                                th:value="${status}" th:text="${status}"></option>
+                                    </select>
+                                    <div class="error-message" th:if="${#fields.hasErrors('status')}" th:errors="*{status}"></div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="numberOfVacancies" class="form-label">Number of Vacancies</label>
+                                <input type="number" class="form-control" id="numberOfVacancies" th:field="*{numberOfVacancies}"
+                                       min="1" placeholder="e.g. 5">
+                                <div class="error-message" th:if="${#fields.hasErrors('numberOfVacancies')}" th:errors="*{numberOfVacancies}"></div>
+                            </div>
+                        </div>
+
+                        <!-- Step 3: Requirements -->
+                        <div class="form-step" id="step3">
+                            <div class="form-header">
+                                <h3 class="h5">Requirements</h3>
+                                <p class="text-muted">Specify the skills, education, and other requirements.</p>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="requiredCGPA" class="form-label">Required CGPA</label>
+                                <input type="number" class="form-control" id="requiredCGPA" th:field="*{requiredCGPA}"
+                                       min="0.0" max="10.0" step="0.1" placeholder="e.g. 7.5">
+                                <div class="form-text">Minimum CGPA required (0.0 to 10.0)</div>
+                                <div class="error-message" th:if="${#fields.hasErrors('requiredCGPA')}" th:errors="*{requiredCGPA}"></div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Required Skills <span class="text-danger">*</span></label>
+                                <div class="border rounded p-3">
+                                    <div class="row" th:each="skill, stat : *{requiredSkills}">
+                                        <div class="col-10 mb-2">
+                                            <input type="text" class="form-control" th:field="*{requiredSkills[__${stat.index}__]}"
+                                                   th:placeholder="'Skill ' + ${stat.index + 1}">
+                                        </div>
+                                        <div class="col-2 mb-2">
+                                            <button type="button" class="btn btn-outline-danger w-100 remove-skill" th:if="${stat.index > 0}">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-outline-primary mt-2" id="addSkill">
+                                    <i class="fas fa-plus"></i> Add Skill
+                                </button>
+                                <div class="error-message" th:if="${#fields.hasErrors('requiredSkills')}" th:errors="*{requiredSkills}"></div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Required Branches <span class="text-danger">*</span></label>
+                                <div class="border rounded p-3" id="branchesContainer">
+                                    <div th:each="branch : ${T(com.aniket.placementcell.enums.Branch).values()}">
+                                        <div class="form-check">
+                                            <input class="form-check-input branch-checkbox"
+                                                   type="checkbox"
+                                                   th:value="${branch}"
+                                                   th:id="${'branch_' + branch.name()}"
+                                                   name="requiredBranches">
+                                            <label class="form-check-label"
+                                                   th:for="${'branch_' + branch.name()}"
+                                                   th:text="${branch}">
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="error-message" th:if="${#fields.hasErrors('requiredBranches')}" th:errors="*{requiredBranches}"></div>
+                            </div>
+                        </div>
+
+                        <!-- Step 4: Drive Information -->
+                        <div class="form-step" id="step4">
+                            <div class="form-header">
+                                <h3 class="h5">Drive Information</h3>
+                                <p class="text-muted">Provide details about the application deadline and drive schedule.</p>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="applicationDeadline" class="form-label">Application Deadline <span class="text-danger">*</span></label>
+                                    <input type="date" class="form-control" id="applicationDeadline" th:field="*{applicationDeadline}">
+                                    <div class="error-message" th:if="${#fields.hasErrors('applicationDeadline')}" th:errors="*{applicationDeadline}"></div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="driveDate" class="form-label">Drive Date <span class="text-danger">*</span></label>
+                                    <input type="date" class="form-control" id="driveDate" th:field="*{driveDate}">
+                                    <div class="error-message" th:if="${#fields.hasErrors('driveDate')}" th:errors="*{driveDate}"></div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="driveTime" class="form-label">Drive Time</label>
+                                    <input type="time" class="form-control" id="driveTime" th:field="*{driveTime}">
+                                </div>
+
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="driveVenue" class="form-label">Drive Venue <span class="text-danger">*</span></label>
+                                <textarea class="form-control" id="driveVenue" th:field="*{driveVenue}"
+                                          rows="3" placeholder="Enter the complete address of the drive venue"></textarea>
+                                <div class="error-message" th:if="${#fields.hasErrors('driveVenue')}" th:errors="*{driveVenue}"></div>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="confirmDetails">
+                                    <label class="form-check-label" for="confirmDetails">
+                                        I confirm that all the information provided is accurate
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Form Navigation -->
+                        <div class="form-navigation">
+                            <button type="button" class="btn btn-outline-secondary" id="prevBtn" disabled>Previous</button>
+                            <button type="button" class="btn btn-primary" id="nextBtn">Next</button>
+                            <button type="submit" class="btn btn-success" id="submitBtn" style="display: none;">Submit Job Posting</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        let currentStep = 1;
+        const totalSteps = 4;
+
+        // DOM Elements with null checks
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const submitBtn = document.getElementById('submitBtn');
+        const addSkillBtn = document.getElementById('addSkill');
+
+        // Check if required elements exist
+        if (!prevBtn || !nextBtn || !submitBtn) {
+            console.error('Required navigation buttons not found');
+            return;
+        }
+
+        // Update form steps
+        function updateFormSteps() {
+            // Hide all steps
+            const formSteps = document.querySelectorAll('.form-step');
+            if (formSteps.length === 0) {
+                console.error('No form steps found');
+                return;
+            }
+
+            formSteps.forEach(step => {
+                step.classList.remove('active');
+            });
+
+            // Show current step
+            const currentStepElement = document.getElementById(`step${currentStep}`);
+            if (currentStepElement) {
+                currentStepElement.classList.add('active');
+            }
+
+            // Update step indicators
+            const stepIndicators = document.querySelectorAll('.step');
+            stepIndicators.forEach((step, index) => {
+                if (index + 1 < currentStep) {
+                    step.classList.remove('active');
+                    step.classList.add('completed');
+                } else if (index + 1 === currentStep) {
+                    step.classList.add('active');
+                    step.classList.remove('completed');
+                } else {
+                    step.classList.remove('active', 'completed');
+                }
+            });
+
+            // Update navigation buttons
+            prevBtn.disabled = currentStep === 1;
+            nextBtn.style.display = currentStep < totalSteps ? 'block' : 'none';
+            submitBtn.style.display = currentStep === totalSteps ? 'block' : 'none';
+        }
+
+        // Next button click
+        nextBtn.addEventListener('click', function() {
+            if (validateStep(currentStep)) {
+                currentStep++;
+                updateFormSteps();
+            }
+        });
+
+        // Previous button click
+        prevBtn.addEventListener('click', function() {
+            currentStep--;
+            updateFormSteps();
+        });
+
+        // Add skill field functionality (only if addSkill button exists)
+        if (addSkillBtn) {
+            addSkillBtn.addEventListener('click', function() {
+                // Find the skills container - it's the previous sibling of the button's parent
+                const skillsContainer = this.closest('.mb-3').querySelector('.border.rounded.p-3');
+                if (!skillsContainer) {
+                    console.error('Skills container not found');
+                    return;
+                }
+
+                const skillCount = skillsContainer.querySelectorAll('.row').length;
+
+                const newSkillRow = document.createElement('div');
+                newSkillRow.className = 'row';
+                newSkillRow.innerHTML = `
+                    <div class="col-10 mb-2">
+                        <input type="text" class="form-control" name="requiredSkills[${skillCount}]"
+                               placeholder="Skill ${skillCount + 1}">
+                    </div>
+                    <div class="col-2 mb-2">
+                        <button type="button" class="btn btn-outline-danger w-100 remove-skill">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+
+                skillsContainer.appendChild(newSkillRow);
+
+                // Add event listener to the new remove button
+                const removeBtn = newSkillRow.querySelector('.remove-skill');
+                if (removeBtn) {
+                    removeBtn.addEventListener('click', function() {
+                        newSkillRow.remove();
+                    });
+                }
+            });
+
+            // Initialize remove skill buttons
+            initializeRemoveSkillButtons();
+        }
+
+        // Initialize remove skill buttons
+        function initializeRemoveSkillButtons() {
+            const removeButtons = document.querySelectorAll('.remove-skill');
+            removeButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const row = this.closest('.row');
+                    if (row) {
+                        row.remove();
+                    }
+                });
+            });
+        }
+
+        // CHECKPOINT 1: Find branch checkboxes - FIXED selector
+        function getBranchCheckboxes() {
+            // Method 1: Look in step 3 for any checkbox containers
+            const step3 = document.getElementById('step3');
+            if (step3) {
+                // Look for the branches container specifically
+                const branchesContainers = step3.querySelectorAll('.border.rounded.p-3');
+                for (let container of branchesContainers) {
+                    // Check if this container is for branches by looking at the previous label
+                    const previousLabel = container.previousElementSibling;
+                    if (previousLabel && previousLabel.textContent && previousLabel.textContent.includes('Required Branches')) {
+                        return container.querySelectorAll('input[type="checkbox"]');
+                    }
+                }
+
+                // Fallback: get all checkboxes in step 3
+                const allCheckboxes = step3.querySelectorAll('input[type="checkbox"]');
+                if (allCheckboxes.length > 0) {
+                    return allCheckboxes;
+                }
+            }
+
+            // Method 2: Look for checkboxes with id starting with "branch_"
+            const branchIdCheckboxes = document.querySelectorAll('input[id^="branch_"]');
+            if (branchIdCheckboxes.length > 0) {
+                return branchIdCheckboxes;
+            }
+
+            // Method 3: Last resort - all checkboxes on page
+            return document.querySelectorAll('input[type="checkbox"]');
+        }
+
+        // CHECKPOINT 2: Check if at least one branch is selected
+        function validateBranches() {
+            const branchCheckboxes = getBranchCheckboxes();
+            console.log('Branch checkboxes found:', branchCheckboxes.length);
+
+            const checkedBranches = Array.from(branchCheckboxes).filter(checkbox => checkbox.checked);
+            console.log('Checked branches:', checkedBranches.length);
+
+            return checkedBranches.length > 0;
+        }
+
+        // CHECKPOINT 3: Find the branches section for error message
+        function getBranchesSection() {
+            // Look through all mb-3 divs to find the one with "Required Branches" label
+            const mb3Sections = document.querySelectorAll('.mb-3');
+            for (let section of mb3Sections) {
+                const label = section.querySelector('label.form-label');
+                if (label && label.textContent.includes('Required Branches')) {
+                    return section;
+                }
+            }
+            return null;
+        }
+
+        // CHECKPOINT 4: Show branch validation error
+        function showBranchError() {
+            const branchesSection = getBranchesSection();
+            if (!branchesSection) {
+                console.error('Branches section not found');
+                return;
+            }
+
+            // Remove any existing branch error
+            const existingError = branchesSection.querySelector('.branch-validation-error');
+            if (existingError) {
+                existingError.remove();
+            }
+
+            // Create new error message
+            const errorElement = document.createElement('div');
+            errorElement.className = 'error-message branch-validation-error';
+            errorElement.textContent = 'At least one branch must be selected';
+            errorElement.style.color = '#dc3545';
+            errorElement.style.fontSize = '0.875rem';
+            errorElement.style.marginTop = '0.25rem';
+
+            // Insert after the branches container
+            const branchesContainer = branchesSection.querySelector('.border.rounded.p-3');
+            if (branchesContainer) {
+                branchesContainer.parentNode.insertBefore(errorElement, branchesContainer.nextSibling);
+            } else {
+                branchesSection.appendChild(errorElement);
+            }
+        }
+
+        // CHECKPOINT 5: Clear branch validation error
+        function clearBranchError() {
+            const branchesSection = getBranchesSection();
+            if (branchesSection) {
+                const errorElement = branchesSection.querySelector('.branch-validation-error');
+                if (errorElement) {
+                    errorElement.remove();
+                }
+            }
+        }
+
+        // CHECKPOINT 6: Debug function to check branch elements
+        function debugBranches() {
+            console.log('=== DEBUG BRANCHES ===');
+
+            const branchCheckboxes = getBranchCheckboxes();
+            console.log('Total branch checkboxes found:', branchCheckboxes.length);
+
+            branchCheckboxes.forEach((checkbox, index) => {
+                console.log(`Branch ${index}:`, {
+                    id: checkbox.id,
+                    name: checkbox.name,
+                    value: checkbox.value,
+                    checked: checkbox.checked
+                });
+            });
+
+            // Check branches section
+            const branchesSection = getBranchesSection();
+            console.log('Branches section found:', !!branchesSection);
+
+            if (branchesSection) {
+                console.log('Branches section HTML:', branchesSection.innerHTML);
+            }
+
+            console.log('=== END DEBUG ===');
+        }
+
+        // Simple step validation
+        function validateStep(step) {
+            let isValid = true;
+
+            // Clear previous errors
+            clearFieldErrors();
+            clearBranchError();
+
+            // Add validation logic for each step here
+            if (step === 1) {
+                const title = document.getElementById('title');
+                const jobId = document.getElementById('jobId');
+                const companyName = document.getElementById('companyName');
+                const jobType = document.getElementById('jobType');
+                const employmentType = document.getElementById('employmentType');
+
+                if (title && !title.value.trim()) {
+                    isValid = false;
+                    showFieldError('title', 'Job title is required');
+                }
+
+                if (jobId && !jobId.value.trim()) {
+                    isValid = false;
+                    showFieldError('jobId', 'Job ID is required');
+                }
+
+                if (companyName && !companyName.value.trim()) {
+                    isValid = false;
+                    showFieldError('companyName', 'Company name is required');
+                }
+
+                if (jobType && !jobType.value) {
+                    isValid = false;
+                    showFieldError('jobType', 'Job type is required');
+                }
+
+                if (employmentType && !employmentType.value) {
+                    isValid = false;
+                    showFieldError('employmentType', 'Employment type is required');
+                }
+            }
+
+            if (step === 2) {
+                const location = document.getElementById('location');
+                const salaryType = document.getElementById('salaryType');
+                const status = document.getElementById('status');
+
+                if (location && !location.value.trim()) {
+                    isValid = false;
+                    showFieldError('location', 'Location is required');
+                }
+
+                if (salaryType && !salaryType.value) {
+                    isValid = false;
+                    showFieldError('salaryType', 'Salary type is required');
+                }
+
+                if (status && !status.value) {
+                    isValid = false;
+                    showFieldError('status', 'Job status is required');
+                }
+            }
+
+            if (step === 3) {
+                // Validate skills
+                const skillInputs = document.querySelectorAll('input[name^="requiredSkills"]');
+                const hasSkills = Array.from(skillInputs).some(input => input.value.trim() !== '');
+
+                if (!hasSkills) {
+                    isValid = false;
+                    // Create error message for skills
+                    const skillsSection = Array.from(document.querySelectorAll('.mb-3')).find(section => {
+                        const label = section.querySelector('label.form-label');
+                        return label && label.textContent.includes('Required Skills');
+                    });
+                    if (skillsSection) {
+                        let errorElement = skillsSection.querySelector('.error-message:not([th\\:if])');
+                        if (!errorElement) {
+                            errorElement = document.createElement('div');
+                            errorElement.className = 'error-message';
+                            // Insert before the "Add Skill" button
+                            const addSkillBtn = skillsSection.querySelector('#addSkill');
+                            if (addSkillBtn) {
+                                skillsSection.insertBefore(errorElement, addSkillBtn);
+                            } else {
+                                skillsSection.appendChild(errorElement);
+                            }
+                        }
+                        errorElement.textContent = 'At least one skill is required';
+                    }
+                }
+
+                // CHECKPOINT: Validate branches
+                console.log('=== Validating branches ===');
+                const hasBranchesSelected = validateBranches();
+                console.log('Branches validation result:', hasBranchesSelected);
+
+                if (!hasBranchesSelected) {
+                    isValid = false;
+                    showBranchError();
+                }
+            }
+
+            if (step === 4) {
+                const applicationDeadline = document.getElementById('applicationDeadline');
+                const driveDate = document.getElementById('driveDate');
+                const driveVenue = document.getElementById('driveVenue');
+                const confirmDetails = document.getElementById('confirmDetails');
+
+                if (applicationDeadline && !applicationDeadline.value) {
+                    isValid = false;
+                    showFieldError('applicationDeadline', 'Application deadline is required');
+                }
+
+                if (driveDate && !driveDate.value) {
+                    isValid = false;
+                    showFieldError('driveDate', 'Drive date is required');
+                }
+
+                if (driveVenue && !driveVenue.value.trim()) {
+                    isValid = false;
+                    showFieldError('driveVenue', 'Drive venue is required');
+                }
+
+                if (confirmDetails && !confirmDetails.checked) {
+                    isValid = false;
+                    showFieldError('confirmDetails', 'Please confirm that all information is accurate');
+                }
+
+                // Validate dates are in the future
+                if (applicationDeadline && applicationDeadline.value) {
+                    const today = new Date().toISOString().split('T')[0];
+                    if (applicationDeadline.value <= today) {
+                        isValid = false;
+                        showFieldError('applicationDeadline', 'Application deadline must be in the future');
+                    }
+                }
+
+                if (driveDate && driveDate.value) {
+                    const today = new Date().toISOString().split('T')[0];
+                    if (driveDate.value <= today) {
+                        isValid = false;
+                        showFieldError('driveDate', 'Drive date must be in the future');
+                    }
+                }
+            }
+
+            return isValid;
+        }
+
+        function showFieldError(fieldId, message) {
+            const field = document.getElementById(fieldId);
+            if (!field) {
+                console.error(`Field with id ${fieldId} not found`);
+                return;
+            }
+
+            let errorElement = field.parentNode.querySelector('.error-message:not([th\\:if])');
+
+            if (!errorElement) {
+                errorElement = document.createElement('div');
+                errorElement.className = 'error-message';
+                field.parentNode.appendChild(errorElement);
+            }
+
+            errorElement.textContent = message;
+            field.classList.add('is-invalid');
+
+            // Scroll to the first error
+            const firstInvalidField = document.querySelector('.is-invalid');
+            if (firstInvalidField === field) {
+                field.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+        function clearFieldErrors() {
+            // Remove custom error messages (only those without th:if attribute)
+            const errorMessages = document.querySelectorAll('.error-message:not([th\\:if])');
+            errorMessages.forEach(error => {
+                error.remove();
+            });
+
+            // Remove invalid class from fields
+            const invalidFields = document.querySelectorAll('.is-invalid');
+            invalidFields.forEach(field => {
+                field.classList.remove('is-invalid');
+            });
+        }
+
+        // Initialize the form
+        updateFormSteps();
+
+        // Debug branches on load to see what's available
+        setTimeout(() => {
+            console.log('Initial branch debug (on load):');
+            debugBranches();
+        }, 500);
+    });
+</script>
+</body>
+</html>

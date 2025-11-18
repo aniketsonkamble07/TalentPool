@@ -80,11 +80,11 @@ public class JobPosting {
     @Column(name = "allowed_branches")
     private List<Branch> requiredBranches;
 
-    @NotBlank(message = "Application deadline is required")
+
     @Future(message = "Application deadline must be in the future")
     private LocalDate applicationDeadline;
 
-    @NotBlank(message = "Drive date is required")
+
     @Future(message = "Drive date must be in the future")
     private LocalDate driveDate;
 

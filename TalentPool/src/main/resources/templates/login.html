@@ -1,0 +1,606 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Login - College Placement Cell</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Prevent favicon errors -->
+    <link rel="icon" href="data:,">
+    <style>
+        /* Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --college-color: #8e44ad;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: var(--dark);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Login Card Styles */
+        .login-card {
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 450px;
+            overflow: hidden;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .login-header {
+            background: linear-gradient(135deg, var(--primary) 0%, #34495e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .login-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            /* Using a reliable Unsplash source URL */
+            background: url('https://source.unsplash.com/random/800x600/?university,campus,education') no-repeat center center/cover;
+            opacity: 0.1;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .logo-icon {
+            font-size: 32px;
+            color: white;
+            margin-right: 10px;
+        }
+
+        .logo-text {
+            font-size: 24px;
+            font-weight: 700;
+            color: white;
+        }
+
+        .college-name {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.8);
+            margin-top: -5px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .login-header h1 {
+            font-size: 24px;
+            margin: 15px 0 5px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .login-header p {
+            font-size: 14px;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .login-body {
+            padding: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        .input-group .icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #777;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px 12px 45px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--secondary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+
+        .form-control.error {
+            border-color: var(--danger);
+        }
+
+        .error-message {
+            color: var(--danger);
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .alert {
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-success {
+            background-color: #d1edff;
+            color: #0c5460;
+            border: 1px solid #b8daff;
+        }
+
+        .remember-forgot {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+        }
+
+        .checkbox-group input {
+            margin-right: 8px;
+        }
+
+        .forgot-password {
+            color: var(--secondary);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s ease;
+        }
+
+        .forgot-password:hover {
+            color: var(--primary);
+            text-decoration: underline;
+        }
+
+        .btn {
+            display: inline-block;
+            width: 100%;
+            padding: 12px;
+            background-color: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-college {
+            background-color: var(--college-color);
+        }
+
+        .btn-college:hover {
+            background-color: #7d3c98;
+        }
+
+        .login-footer {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .login-footer p {
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .register-link {
+            color: var(--secondary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .register-link:hover {
+            color: var(--primary);
+            text-decoration: underline;
+        }
+
+        /* Additional Options */
+        .login-options {
+            margin-top: 25px;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .divider span {
+            padding: 0 10px;
+            color: #777;
+            font-size: 14px;
+        }
+
+        .social-login {
+            display: flex;
+            gap: 15px;
+        }
+
+        .social-btn {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: white;
+            color: #555;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .social-btn:hover {
+            background-color: #f5f5f5;
+            transform: translateY(-2px);
+        }
+
+        .social-btn i {
+            margin-right: 8px;
+        }
+
+        /* Back to Home */
+        .back-home {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .back-home a {
+            color: white;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            transition: color 0.3s ease;
+        }
+
+        .back-home a:hover {
+            color: var(--light);
+        }
+
+        .back-home i {
+            margin-right: 8px;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 576px) {
+            .login-card {
+                max-width: 100%;
+            }
+
+            .login-body {
+                padding: 20px;
+            }
+
+            .remember-forgot {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .forgot-password {
+                margin-top: 10px;
+            }
+
+            .social-login {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="login-card">
+        <div class="login-header">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <div>
+                    <div class="logo-text">Placement Cell</div>
+                    <div class="college-name">ABC College of Engineering & Technology</div>
+                </div>
+            </div>
+            <h1>Student Login</h1>
+            <p>Access your placement portal</p>
+        </div>
+
+        <div class="login-body">
+            <!-- Error Message Display -->
+            <div th:if="${error}" class="alert alert-error" style="display: block;">
+                <i class="fas fa-exclamation-circle"></i>
+                <span th:text="${error}">Invalid credentials</span>
+            </div>
+
+            <!-- Success Message Display -->
+            <div th:if="${param.registered}" class="alert alert-success" style="display: block;">
+                <i class="fas fa-check-circle"></i>
+                Registration successful! Please login with your credentials.
+            </div>
+
+            <form id="loginForm" th:action="@{/auth/login}" method="post" th:object="${loginDTO}">
+                <div class="form-group">
+                    <label for="username">Email or CRN</label>
+                    <div class="input-group">
+                        <div class="icon"><i class="fas fa-user"></i></div>
+                        <input type="text" id="username" th:field="*{username}" class="form-control" placeholder="Enter your CRN or email" required>
+                    </div>
+                    <div class="error-message" id="usernameError">Please enter a valid email or CRN</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="input-group">
+                        <div class="icon"><i class="fas fa-lock"></i></div>
+                        <input type="password" id="password" th:field="*{password}" class="form-control" placeholder="Enter your password" required>
+                    </div>
+                    <div class="error-message" id="passwordError">Please enter your password</div>
+                </div>
+
+                <div class="remember-forgot">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="remember" name="remember">
+                        <label for="remember">Remember me</label>
+                    </div>
+                    <a th:href="@{/pvg/forgot-password}" class="forgot-password">Forgot Password?</a>
+                </div>
+
+                <button type="submit" class="btn btn-college">Login to Portal</button>
+            </form>
+
+            <div class="login-options">
+                <div class="divider">
+                    <span>Or login with</span>
+                </div>
+
+                <div class="social-login">
+                    <a href="#" class="social-btn">
+                        <i class="fab fa-google"></i> Google
+                    </a>
+                    <a href="#" class="social-btn">
+                        <i class="fab fa-microsoft"></i> Microsoft
+                    </a>
+                </div>
+            </div>
+
+            <div class="login-footer">
+                <p>Don't have an account? <a th:href="@{/student/register}" class="register-link">Register here</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="back-home">
+    <a th:href="@{/home}"><i class="fas fa-arrow-left"></i> Back to Home</a>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const loginForm = document.getElementById('loginForm');
+        const errorAlert = document.querySelector('.alert-error');
+
+        // Hide error alert after 5 seconds
+        if (errorAlert && errorAlert.style.display === 'block') {
+            setTimeout(() => {
+                errorAlert.style.display = 'none';
+            }, 5000);
+        }
+
+        loginForm.addEventListener('submit', function(e) {
+            // Client-side validation
+            if (!validateForm()) {
+                e.preventDefault();
+            }
+            // If validation passes, form will submit to Spring Boot
+        });
+
+        function validateForm() {
+            resetErrors();
+
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+
+            let isValid = true;
+
+            // Validate username (CRN or email)
+            if (!username) {
+                showError('username', 'Please enter your CRN number or email');
+                isValid = false;
+            } else if (username.includes('@')) {
+                // Email validation
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(username)) {
+                    showError('username', 'Please enter a valid email address');
+                    isValid = false;
+                }
+            } else {
+                // CRN validation (numeric)
+                const crnRegex = /^\d+$/;
+                if (!crnRegex.test(username)) {
+                    showError('username', 'Please enter a valid CRN number');
+                    isValid = false;
+                }
+            }
+
+            // Validate password
+            if (!password) {
+                showError('password', 'Please enter your password');
+                isValid = false;
+            } else if (password.length < 6) {
+                showError('password', 'Password must be at least 6 characters');
+                isValid = false;
+            }
+
+            return isValid;
+        }
+
+        function resetErrors() {
+            const errorMessages = document.querySelectorAll('.error-message');
+            errorMessages.forEach(error => {
+                error.style.display = 'none';
+            });
+
+            const formControls = document.querySelectorAll('.form-control');
+            formControls.forEach(control => {
+                control.classList.remove('error');
+            });
+        }
+
+        function showError(fieldId, message) {
+            const errorElement = document.getElementById(`${fieldId}Error`);
+            const fieldElement = document.getElementById(fieldId);
+
+            if (errorElement && fieldElement) {
+                errorElement.textContent = message;
+                errorElement.style.display = 'block';
+                fieldElement.classList.add('error');
+                fieldElement.focus();
+            }
+        }
+
+        // Real-time validation
+        document.getElementById('username').addEventListener('blur', function() {
+            const username = this.value.trim();
+            if (username) {
+                if (username.includes('@')) {
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!emailRegex.test(username)) {
+                        showError('username', 'Please enter a valid email address');
+                    } else {
+                        resetFieldError('username');
+                    }
+                } else {
+                    const crnRegex = /^\d+$/;
+                    if (!crnRegex.test(username)) {
+                        showError('username', 'Please enter a valid CRN number');
+                    } else {
+                        resetFieldError('username');
+                    }
+                }
+            }
+        });
+
+        document.getElementById('password').addEventListener('blur', function() {
+            const password = this.value.trim();
+            if (password && password.length < 6) {
+                showError('password', 'Password must be at least 6 characters');
+            } else if (password) {
+                resetFieldError('password');
+            }
+        });
+
+        function resetFieldError(fieldId) {
+            const errorElement = document.getElementById(`${fieldId}Error`);
+            const fieldElement = document.getElementById(fieldId);
+
+            if (errorElement && fieldElement) {
+                errorElement.style.display = 'none';
+                fieldElement.classList.remove('error');
+            }
+        }
+    });
+</script>
+</body>
+</html>

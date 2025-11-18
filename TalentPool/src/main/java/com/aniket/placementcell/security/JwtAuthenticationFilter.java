@@ -16,17 +16,17 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private static final List<String> PUBLIC_PATHS = List.of(
-            "/pvg/register", "/pvg/login", "/css/", "/js/", "/images/", "/public/",
-            "/error", "/favicon.ico", "/webjars/", "/v3/api-docs", "/swagger-ui/"
+            "/auth/login", "/auth/register", "/auth/verify",
+            "/student/register", "/css/", "/js/", "/images/", "/public/",
+            "/error", "/favicon.ico", "/webjars/",
+            "/v3/api-docs", "/swagger-ui/", "/swagger-resources/"
     );
 
     @Autowired
@@ -41,76 +41,79 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String path = request.getRequestURI();
         String method = request.getMethod();
 
-        System.out.println("Processing request: " + method + " " + path);
-
-        // Skip JWT validation for public endpoints
-        if (isPublicPath(path)) {
-            System.out.println("Skipping JWT validation for public path: " + path);
-            filterChain.doFilter(request, response);
-            return;
-        }
+        System.out.println("\n Processing " + method + " " + path);
 
         try {
-            Optional<String> token = extractToken(request);
+            String token = extractToken(request);
 
-            if (token.isPresent()) {
+            if (token != null) {
                 System.out.println("JWT token found, validating...");
-                if (jwtUtil.validateToken(token.get())) {
-                    setAuthenticationContext(token.get(), request);
-                    System.out.println("Authentication set successfully");
+
+                if (jwtUtil.validateToken(token)) {
+                    setAuthenticationContext(token, request);
+                    System.out.println("Authentication successful");
                 } else {
                     System.out.println("Invalid JWT token");
+                    sendErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED,
+                            "Invalid or expired token");
+                    return;
                 }
             } else {
                 System.out.println("No JWT token found in request");
+                sendErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED,
+                        "Authorization token required");
+                return;
             }
         } catch (JwtException e) {
             System.out.println("JWT validation failed: " + e.getMessage());
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("{\"error\": \"Invalid or expired token\"}");
+            sendErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED,
+                    "Token validation failed: " + e.getMessage());
             return;
         } catch (Exception e) {
-            System.out.println("Unexpected error during JWT authentication: " + e.getMessage());
+            System.out.println("Unexpected error: " + e.getMessage());
             e.printStackTrace();
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            sendErrorResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                    "Internal server error");
             return;
         }
 
         filterChain.doFilter(request, response);
     }
 
-    private boolean isPublicPath(String path) {
-        boolean isPublic = PUBLIC_PATHS.stream().anyMatch(path::startsWith);
-        System.out.println("Path: " + path + " is public: " + isPublic);
-        return isPublic;
+    private String extractToken(HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String token = authHeader.substring(7).trim();
+            if (!token.isEmpty()) {
+                System.out.println("Token extracted from Authorization header");
+                System.out.println("FULL TOKEN RECEIVED: " + token);
+                System.out.println("TOKEN LENGTH: " + token.length());
+                System.out.println("TOKEN STARTS WITH: " + token.substring(0, Math.min(20, token.length())));
+                return token;
+            }
+        }
+        // 2. If header not present, check cookies
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if ("jwt".equals(cookie.getName())) {
+                    String token = cookie.getValue();
+                    System.out.println("Token extracted from cookie");
+                    return token; // now we return the cookie token
+                }
+            }
+        }
+
+
+        System.out.println("Authorization Header: " + authHeader);
+        return null;
     }
 
-    private Optional<String> extractToken(HttpServletRequest request) {
-        // Try Authorization header first
-        String authHeader = request.getHeader("Authorization");
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            String token = authHeader.substring(7);
-            System.out.println("Token extracted from Authorization header");
-            return Optional.of(token);
+    private String getTokenPreview(String token) {
+        if (token.length() <= 50) {
+            return token;
         }
-
-        // Try cookies
-        if (request.getCookies() != null) {
-            Optional<String> cookieToken = Arrays.stream(request.getCookies())
-                    .filter(c -> "jwt".equals(c.getName()))
-                    .map(Cookie::getValue)
-                    .findFirst();
-
-            if (cookieToken.isPresent()) {
-                System.out.println("Token extracted from cookie");
-            } else {
-                System.out.println("No JWT cookie found");
-            }
-            return cookieToken;
-        }
-
-        System.out.println("No token found in request");
-        return Optional.empty();
+        return token.substring(0, 20) + "..." + token.substring(token.length() - 10);
     }
 
     private void setAuthenticationContext(String token, HttpServletRequest request) {
@@ -118,10 +121,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String username = claims.getSubject();
         String role = claims.get("role", String.class);
 
-        System.out.println("Setting authentication for user: " + username + " with role: " + role);
+        System.out.println("Setting authentication for: " + username + " | Role: " + role);
 
-        if (username != null) {
-            var authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role));
+        if (username != null && role != null) {
+            var authorities = Collections.singletonList(
+                    new SimpleGrantedAuthority("ROLE_" + role)
+            );
 
             UsernamePasswordAuthenticationToken authToken =
                     new UsernamePasswordAuthenticationToken(username, null, authorities);
@@ -129,17 +134,24 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authToken);
 
-            System.out.println("Authentication context set successfully for user: " + username);
+            System.out.println("Security context set for user: " + username);
         } else {
-            System.out.println("Username is null in token");
+            throw new JwtException("Invalid token: missing username or role");
         }
+    }
+
+    private void sendErrorResponse(HttpServletResponse response, int status, String message)
+            throws IOException {
+        response.setStatus(status);
+        response.setContentType("application/json");
+        response.getWriter().write("{\"error\": \"" + message + "\"}");
     }
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI();
-        boolean shouldNotFilter = isPublicPath(path);
-        System.out.println("Should not filter path " + path + ": " + shouldNotFilter);
-        return shouldNotFilter;
+        boolean shouldSkip = PUBLIC_PATHS.stream().anyMatch(path::startsWith);
+        System.out.println(path + " - Skip filtering: " + shouldSkip);
+        return shouldSkip;
     }
 }

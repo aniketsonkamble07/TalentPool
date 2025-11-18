@@ -1,7 +1,7 @@
 package com.aniket.placementcell.enums;
 
 public enum Role {
-    Student,
+    STUDENT,
     HEAD_PLACEMENT,
     PLACEMENT_OFFICER,
     STUDENT_COORDINATOR,
