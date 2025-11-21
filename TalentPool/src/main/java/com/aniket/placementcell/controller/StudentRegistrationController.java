@@ -13,12 +13,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
@@ -72,50 +75,52 @@ public class StudentRegistrationController {
     }
 
 
+    @Autowired
+    private SecurityContextRepository securityContextRepository;
+
     @PostMapping("/register")
     public String registrationPage(
             @ModelAttribute("studentRequestDTO") @Valid StudentRegistrationRequestDTO studentRegistrationRequestDTO,
             BindingResult bindingResult,
-            Model model,
-            HttpServletResponse response,
-            HttpServletRequest request) {
+            RedirectAttributes redirectAttributes,
+            HttpServletRequest request,
+            HttpServletResponse response) {
 
         if (bindingResult.hasErrors()) {
-            model.addAttribute("success", false);
-            model.addAttribute("message", "Please correct the errors in the form");
-            return "register";
+            redirectAttributes.addFlashAttribute("error", "Please correct the errors in the form");
+            return "redirect:/register";
         }
 
         ApiResponse<?> apiResponse = service.registerStudent(studentRegistrationRequestDTO);
 
         if (apiResponse.isSuccess()) {
 
-            // 1. Create Spring session authentication
-            List<GrantedAuthority> authorities =
-                    List.of(new SimpleGrantedAuthority("ROLE_STUDENT"));
-
-            UsernamePasswordAuthenticationToken authToken =
+            // Declare the variable properly here
+            UsernamePasswordAuthenticationToken authenticationToken =
                     new UsernamePasswordAuthenticationToken(
                             studentRegistrationRequestDTO.getEmail(),
                             null,
-                            authorities
+                            List.of(new SimpleGrantedAuthority("ROLE_STUDENT"))
                     );
 
-            SecurityContextHolder.getContext().setAuthentication(authToken);
+            // Create context
+            SecurityContext context = SecurityContextHolder.createEmptyContext();
+            context.setAuthentication(authenticationToken);
 
-            // 2. Create HTTP Session (required!)
-            HttpSession session = request.getSession(true);
-            session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
-                    SecurityContextHolder.getContext());
+            // Save context into session
+            securityContextRepository.saveContext(context, request, response);
+
+            // Also set in SecurityContextHolder
+            SecurityContextHolder.setContext(context);
 
             return "redirect:/student/home";
-        } else {
-            model.addAttribute("success", false);
-            model.addAttribute("message", apiResponse.getMessage());
-            model.addAttribute("description", apiResponse.getDescription());
-            return "register";
         }
+
+        redirectAttributes.addFlashAttribute("error", apiResponse.getMessage());
+        return "redirect:/register";
     }
+
+
 
 
 

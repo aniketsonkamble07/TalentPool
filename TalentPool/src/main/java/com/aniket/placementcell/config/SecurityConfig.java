@@ -15,6 +15,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.security.web.context.SecurityContextRepository;
 
 @Configuration
 @RequiredArgsConstructor
@@ -37,7 +39,10 @@ public class SecurityConfig {
         return provider;
     }
 
-
+    @Bean
+    public SecurityContextRepository securityContextRepository() {
+        return new HttpSessionSecurityContextRepository();
+    }
 
     @Bean
     public AuthenticationManager authenticationManager(
@@ -77,7 +82,8 @@ public class SecurityConfig {
                         ).permitAll()
                         .requestMatchers("/student/job/{id}",
                                 "/student/home").hasRole("STUDENT")
-                        .requestMatchers("/admin/registerOfficer").hasRole("PLACEMENT_OFFICER")
+                        .requestMatchers("/admin/registerOfficer","/admin/officers/list",
+                                "/admin/students/list").hasRole("PLACEMENT_OFFICER")
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)

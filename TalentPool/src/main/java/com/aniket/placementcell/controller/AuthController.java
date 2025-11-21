@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
-/*
+
 @RestController
 @RequestMapping("/auth")
 @CrossOrigin(origins = "*")
@@ -132,7 +132,7 @@ public class AuthController {
     }
 }
 
-*/
+/*
 
 
 @Controller
@@ -169,7 +169,7 @@ public class AuthController {
         try {
             System.out.println("\n[LOGIN] Attempt for: " + loginDTO.getUsername());
 
-            // 1️⃣ Authenticate user credentials
+            // Authenticate user credentials
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             loginDTO.getUsername(),
@@ -179,7 +179,7 @@ public class AuthController {
 
             System.out.println("[LOGIN] Authentication success.");
 
-            // 2️⃣ Extract authority like ROLE_STUDENT
+            //  Extract authority like ROLE_STUDENT
             String authority = authentication.getAuthorities().stream()
                     .map(GrantedAuthority::getAuthority)
                     .findFirst()
@@ -187,17 +187,17 @@ public class AuthController {
 
             System.out.println("[LOGIN] Spring Authority: " + authority);
 
-            // 3️⃣ Convert to Enum: STUDENT | ADMIN | PLACEMENT_OFFICER
+            // Convert to Enum: STUDENT | ADMIN | PLACEMENT_OFFICER
             String enumName = authority.replace("ROLE_", "").toUpperCase();
             Role role = Role.valueOf(enumName);
 
             System.out.println("[LOGIN] Enum Role: " + role);
 
-            // 4️⃣ Generate JWT token
+            // Generate JWT token
             String token = jwtUtil.generateToken(loginDTO.getUsername(), role);
             System.out.println("[TOKEN] Generated JWT: " + token);
 
-            // 5️⃣ Store JWT in HttpOnly cookie
+            // Store JWT in HttpOnly cookie
 
             Cookie jwtCookie = new Cookie("jwt", token);
             jwtCookie.setHttpOnly(true);
@@ -213,7 +213,7 @@ public class AuthController {
 
             response.addCookie(jwtCookie);
 
-            // 6️⃣ Redirect based on role
+            //  Redirect based on role
             return determineRedirectUrl(authority);
 
         } catch (Exception e) {
@@ -249,3 +249,4 @@ public class AuthController {
     }
 }
 
+*/

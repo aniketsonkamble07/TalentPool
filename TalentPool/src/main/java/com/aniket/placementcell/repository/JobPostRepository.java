@@ -21,6 +21,7 @@ public interface JobPostRepository extends JpaRepository<JobPosting, Long> {
     Optional<JobPosting> findByJobId(String jobId);
 
 
+
     // Find recommended jobs based on student's branch and CGPA
     @Query("SELECT j FROM JobPosting j WHERE j.status = com.aniket.placementcell.enums.JobStatus.PUBLISHED AND j.applicationDeadline >= CURRENT_DATE ORDER BY j.createdAt DESC")
     List<JobPosting> findActiveJobsWithValidDeadline();

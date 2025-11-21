@@ -15,6 +15,7 @@ import java.util.List;
 @Getter
 @Setter
 public class JobPostingResponseDTO {
+
     private String title;
     private String jobId;
     private String description;

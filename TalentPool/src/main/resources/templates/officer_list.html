@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Placement Officers - Placement Cell</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --success: #2ecc71;
+            --warning: #f39c12;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .page-title {
+            color: white;
+        }
+
+        .page-title h1 {
+            font-size: 2.5rem;
+            margin-bottom: 5px;
+        }
+
+        .page-title p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background-color: var(--secondary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 2px solid white;
+            color: white;
+        }
+
+        .btn-outline:hover {
+            background-color: white;
+            color: var(--primary);
+        }
+
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .main-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, var(--primary) 0%, #34495e 100%);
+            color: white;
+            padding: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-header h2 {
+            margin: 0;
+        }
+
+        .search-filter {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-box input {
+            padding: 10px 15px 10px 40px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            width: 250px;
+            font-size: 14px;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #777;
+        }
+
+        .filter-select {
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background: white;
+            font-size: 14px;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        .officers-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .officers-table th {
+            background-color: #f8f9fa;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--dark);
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .officers-table td {
+            padding: 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .officer-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .officer-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .officer-details h4 {
+            margin: 0 0 5px 0;
+            color: var(--dark);
+        }
+
+        .officer-details p {
+            margin: 0;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-active {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-inactive {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .role-badge {
+            padding: 6px 12px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: 600;
+            background-color: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .action-buttons-small {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-edit {
+            background-color: var(--warning);
+            color: white;
+        }
+
+        .btn-delete {
+            background-color: var(--accent);
+            color: white;
+        }
+
+        .btn-view {
+            background-color: var(--secondary);
+            color: white;
+        }
+
+        .btn-sm:hover {
+            opacity: 0.8;
+            transform: translateY(-1px);
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+            gap: 10px;
+        }
+
+        .pagination button {
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .pagination button.active {
+            background-color: var(--secondary);
+            color: white;
+            border-color: var(--secondary);
+        }
+
+        .pagination button:hover:not(.active) {
+            background-color: #f8f9fa;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: #ddd;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+
+            .action-buttons {
+                justify-content: center;
+            }
+
+            .card-header {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .search-filter {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .search-box input {
+                width: 100%;
+            }
+
+            .officer-info {
+                flex-direction: column;
+                text-align: center;
+                gap: 8px;
+            }
+
+            .action-buttons-small {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- Header -->
+    <div class="header">
+        <div class="page-title">
+            <h1><i class="fas fa-user-tie"></i> Placement Officers</h1>
+            <p>Manage placement officers and their access</p>
+        </div>
+        <div class="action-buttons">
+            <a th:href="@{/admin/dashboard}" class="btn btn-outline">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+            <a th:href="@{/admin/registerOfficer}" class="btn btn-primary">
+                <i class="fas fa-user-plus"></i> Add New Officer
+            </a>
+        </div>
+    </div>
+
+    <!-- Success/Error Messages -->
+    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+    <!-- Statistics -->
+    <div class="stats-container">
+        <div class="stat-card">
+            <div class="stat-icon" style="color: var(--secondary);">
+                <i class="fas fa-user-tie"></i>
+            </div>
+            <div class="stat-number" th:text="${totalOfficers}">0</div>
+            <div class="stat-label">Total Officers</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="color: var(--success);">
+                <i class="fas fa-user-check"></i>
+            </div>
+            <div class="stat-number" th:text="${activeOfficers}">0</div>
+            <div class="stat-label">Active Officers</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="color: var(--warning);">
+                <i class="fas fa-user-clock"></i>
+            </div>
+            <div class="stat-number" th:text="${inactiveOfficers}">0</div>
+            <div class="stat-label">Inactive Officers</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="color: var(--accent);">
+                <i class="fas fa-users-cog"></i>
+            </div>
+            <div class="stat-number" th:text="${departments}">5</div>
+            <div class="stat-label">Departments</div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-card">
+        <div class="card-header">
+            <h2><i class="fas fa-list"></i> Officer Management</h2>
+            <div class="search-filter">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Search officers...">
+                </div>
+                <select class="filter-select" id="statusFilter">
+                    <option value="">All Status</option>
+                    <option value="ACTIVE">Active</option>
+                    <option value="INACTIVE">Inactive</option>
+                </select>
+                <select class="filter-select" id="roleFilter">
+                    <option value="">All Roles</option>
+                    <option value="HEAD_PLACEMENT">Head Placement</option>
+                    <option value="PLACEMENT_OFFICER">Placement Officer</option>
+                    <option value="INDUSTRY_RELATIONS_MANAGER">Industry Relations</option>
+                    <option value="STUDENT_COORDINATOR">Student Coordinator</option>
+                    <option value="JOB_COORDINATOR">Job Coordinator</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table class="officers-table">
+                <thead>
+                <tr>
+                    <th>Officer</th>
+                    <th>Position</th>
+                    <th>Role</th>
+                    <th>Contact</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody id="officersTableBody">
+                <!-- Sample Data - Replace with Thymeleaf loop -->
+                <tr th:each="officer : ${officers}">
+                    <td>
+                        <div class="officer-info">
+                            <div class="officer-avatar" th:text="${#strings.substring(officer.name, 0, 1)}">J</div>
+                            <div class="officer-details">
+                                <h4 th:text="${officer.name}">John Doe</h4>
+                                <p th:text="${officer.email}">john.doe@college.edu</p>
+                            </div>
+                        </div>
+                    </td>
+                    <td th:text="${officer.position}">Senior Placement Officer</td>
+                    <td>
+                        <span class="role-badge" th:text="${officer.role}">PLACEMENT_OFFICER</span>
+                    </td>
+                    <td>
+                        <div style="font-size: 14px;">
+                            <div th:text="${officer.mobileNumber}">+91 9876543210</div>
+                            <div style="color: #666; margin-top: 2px;" th:text="${officer.email}">john.doe@college.edu</div>
+                        </div>
+                    </td>
+                    <td>
+                            <span th:if="${officer.active}" class="status-badge status-active">
+                                <i class="fas fa-check-circle"></i> Active
+                            </span>
+                        <span th:unless="${officer.active}" class="status-badge status-inactive">
+                                <i class="fas fa-times-circle"></i> Inactive
+                            </span>
+                    </td>
+                    <td>
+                        <div class="action-buttons-small">
+                            <button class="btn-sm btn-view" th:onclick="|viewOfficer('${officer.id}')|">
+                                <i class="fas fa-eye"></i> View
+                            </button>
+                            <button class="btn-sm btn-edit" th:onclick="|editOfficer('${officer.id}')|">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button th:if="${officer.active}" class="btn-sm btn-delete" th:onclick="|deactivateOfficer('${officer.id}')|">
+                                <i class="fas fa-ban"></i> Deactivate
+                            </button>
+                            <button th:unless="${officer.active}" class="btn-sm btn-edit" th:onclick="|activateOfficer('${officer.id}')|">
+                                <i class="fas fa-check"></i> Activate
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+
+                <!-- Empty State -->
+                <tr th:unless="${#lists.isEmpty(officers)}">
+                    <td colspan="6">
+                        <div class="empty-state">
+                            <i class="fas fa-user-tie"></i>
+                            <h3>No Officers Found</h3>
+                            <p>Get started by adding your first placement officer.</p>
+                            <a th:href="@{/admin/officers/register}" class="btn btn-primary" style="margin-top: 15px;">
+                                <i class="fas fa-user-plus"></i> Add First Officer
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination">
+            <button onclick="changePage(1)" class="active">1</button>
+            <button onclick="changePage(2)">2</button>
+            <button onclick="changePage(3)">3</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', filterOfficers);
+        document.getElementById('statusFilter').addEventListener('change', filterOfficers);
+        document.getElementById('roleFilter').addEventListener('change', filterOfficers);
+    });
+
+    function filterOfficers() {
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        const statusFilter = document.getElementById('statusFilter').value;
+        const roleFilter = document.getElementById('roleFilter').value;
+
+        const rows = document.querySelectorAll('#officersTableBody tr');
+
+        rows.forEach(row => {
+            const name = row.querySelector('.officer-details h4').textContent.toLowerCase();
+            const email = row.querySelector('.officer-details p').textContent.toLowerCase();
+            const position = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+            const role = row.querySelector('.role-badge').textContent;
+            const status = row.querySelector('.status-badge').textContent.includes('Active') ? 'ACTIVE' : 'INACTIVE';
+
+            const matchesSearch = name.includes(searchTerm) || email.includes(searchTerm) || position.includes(searchTerm);
+            const matchesStatus = !statusFilter || status === statusFilter;
+            const matchesRole = !roleFilter || role === roleFilter;
+
+            row.style.display = (matchesSearch && matchesStatus && matchesRole) ? '' : 'none';
+        });
+    }
+
+    function viewOfficer(id) {
+        window.location.href = '/admin/officers/' + id;
+    }
+
+    function editOfficer(id) {
+        window.location.href = '/admin/officers/' + id + '/edit';
+    }
+
+    function activateOfficer(id) {
+        if (confirm('Are you sure you want to activate this officer?')) {
+            // API call to activate officer
+            console.log('Activating officer:', id);
+            // Reload page or update UI
+            location.reload();
+        }
+    }
+
+    function deactivateOfficer(id) {
+        if (confirm('Are you sure you want to deactivate this officer?')) {
+            // API call to deactivate officer
+            console.log('Deactivating officer:', id);
+            // Reload page or update UI
+            location.reload();
+        }
+    }
+
+    function changePage(page) {
+        // Implement pagination logic
+        console.log('Changing to page:', page);
+        // Update active page button
+        document.querySelectorAll('.pagination button').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        event.target.classList.add('active');
+    }
+</script>
+</body>
+</html>

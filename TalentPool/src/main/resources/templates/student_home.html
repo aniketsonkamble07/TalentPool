@@ -565,19 +565,22 @@
                 <div class="content-card">
                     <h3 style="margin-bottom: 15px; font-size: 20px;">Recent Applications</h3>
                     <div th:if="${student.appliedDTOList != null && !student.appliedDTOList.empty}">
-                        <div class="application-card" th:each="application : ${student.appliedDTOList}">
+                        <div class="application-card" th:each="appliedJobs : ${student.appliedDTOList}">
                             <div class="application-header">
                                 <div>
-                                    <div class="job-title" th:text="${application.title}">Job Title</div>
-                                    <div class="company" th:text="${application.companyName}">Company Name</div>
+                                    <div class="job-title" th:text="${appliedJobs.title}">Job Title</div>
+                                    <div class="company" th:text="${appliedJobs.companyName}">Company Name</div>
                                     <div class="application-date">Applied on: <span th:text="${#temporals.format(application.appliedDate, 'MMMM dd, yyyy')}">Date</span></div>
                                 </div>
                                 <div class="application-status"
-                                     th:classappend="${application.applicationStatus == 'PENDING'} ? 'status-pending' :
-                                                     ${application.applicationStatus == 'UNDER_REVIEW'} ? 'status-reviewed' :
-                                                     ${application.applicationStatus == 'ACCEPTED'} ? 'status-accepted' :
-                                                     'status-rejected'"
-                                     th:text="${application.applicationStatus}">Status</div>
+                                     th:classappend="${
+    appliedJobs.applicationStatus == 'PENDING' ? 'status-pending' :
+    appliedJobs.applicationStatus == 'UNDER_REVIEW' ? 'status-reviewed' :
+    appliedJobs.applicationStatus == 'ACCEPTED' ? 'status-accepted' :
+    'status-rejected'
+}"
+
+                                     th:text="${appliedJobs.applicationStatus}">Status</div>
                             </div>
                         </div>
                     </div>
@@ -713,21 +716,24 @@
                 </div>
             </div>
             <div th:if="${student.appliedDTOList != null && !student.appliedDTOList.empty}">
-                <div class="application-card" th:each="application : ${student.appliedDTOList}">
+                <div class="application-card" th:each="appliedJobs : ${student.appliedDTOList}">
                     <div class="application-header">
                         <div>
-                            <div class="job-title" th:text="${application.title}">Job Title</div>
-                            <div class="company" th:text="${application.companyName}">Company Name</div>
-                            <div class="application-date">Applied on: <span th:text="${#temporals.format(application.appliedDate, 'MMMM dd, yyyy')}">Date</span></div>
+                            <div class="job-title" th:text="${appliedJobs.title}">Job Title</div>
+                            <div class="company" th:text="${appliedJobs.companyName}">Company Name</div>
+                            <div class="application-date">Applied on: <span th:text="${#temporals.format(appliedJobs.appliedDate, 'MMMM dd, yyyy')}">Date</span></div>
                         </div>
                         <div class="application-status"
-                             th:classappend="${application.applicationStatus == 'PENDING'} ? 'status-pending' :
-                                             ${application.applicationStatus == 'UNDER_REVIEW'} ? 'status-reviewed' :
-                                             ${application.applicationStatus == 'ACCEPTED'} ? 'status-accepted' :
-                                             'status-rejected'"
-                             th:text="${application.applicationStatus}">Status</div>
+                             th:classappend="${
+    appliedJobs.applicationStatus == 'PENDING' ? 'status-pending' :
+    appliedJobs.applicationStatus == 'UNDER_REVIEW' ? 'status-reviewed' :
+    appliedJobs.applicationStatus == 'ACCEPTED' ? 'status-accepted' :
+    'status-rejected'
+}"
+
+                             th:text="${appliedJobs.applicationStatus}">Status</div>
                     </div>
-                    <p th:text="${application.location != null ? 'Location: ' + application.location : ''}"></p>
+                    <p th:text="${appliedJobs.location != null ? 'Location: ' + appliedJobs.location : ''}"></p>
                 </div>
             </div>
             <div th:if="${student.appliedDTOList == null || student.appliedDTOList.empty}">
@@ -780,9 +786,13 @@
                         Job description will appear here...
                     </div>
                     <div class="job-actions">
-                        <button class="btn btn-primary">Apply Now</button>
-                        <a th:href="@{/student/job/details/{jobId}(jobId=${job.jobId})}" class="btn btn-outline">View Details</a>
+                        <a th:href="@{/student/job/apply/{jobId}(jobId=${job.jobId})}"
+                           class="btn btn-primary">Apply Now</a>
+
+                        <a th:href="@{/student/job/details/{jobId}(jobId=${job.jobId})}"
+                           class="btn btn-outline">View Details</a>
                     </div>
+
                 </div>
 
                 <!-- No jobs message -->

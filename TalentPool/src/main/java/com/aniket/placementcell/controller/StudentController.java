@@ -1,5 +1,6 @@
 package com.aniket.placementcell.controller;
 
+import com.aniket.placementcell.dto.ApiResponse;
 import com.aniket.placementcell.dto.JobPostingResponseDTO;
 import com.aniket.placementcell.dto.StudentResponseDTO;
 import com.aniket.placementcell.service.StudentService;
@@ -9,9 +10,15 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
+
+
+
+
 @Controller
 @RequestMapping("/student")
 public class StudentController {
@@ -37,6 +44,7 @@ public class StudentController {
 
         model.addAttribute("student", student);
         model.addAttribute("jobs", jobs);
+        model.addAttribute("appliedJobs", student.getAppliedDTOList());
 
         return "student_home";
     }
@@ -56,4 +64,27 @@ public class StudentController {
 
         return "job_details";
     }
+
+    @GetMapping("/job/apply/{jobId}")
+    public String applyForJob(@PathVariable String jobId,
+                              RedirectAttributes redirectAttributes,
+                              Authentication authentication) {
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            redirectAttributes.addFlashAttribute("error", "Please login first.");
+            return "redirect:/auth/login";
+        }
+
+        String username = authentication.getName();
+        ApiResponse<?> response = service.validateApplyForJob(jobId, username);
+
+        if (response.isSuccess()) {
+            redirectAttributes.addFlashAttribute("success", "Successfully applied for the job.");
+        } else {
+            redirectAttributes.addFlashAttribute("error", response.getMessage());
+        }
+
+        return "redirect:/student/home";
+    }
+
 }

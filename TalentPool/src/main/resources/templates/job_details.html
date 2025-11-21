@@ -306,9 +306,14 @@
         </div>
 
         <div class="action-buttons">
-            <button class="btn btn-primary" onclick="applyForJob()">
-                <i class="fas fa-paper-plane"></i> Apply Now
+            <button>
+                <a th:href="@{/student/job/apply/{jobId}(jobId=${job.jobId})}"
+                   class="btn btn-primary">
+                    <i class="fas fa-paper-plane"></i> Apply Now
+                </a>
             </button>
+
+
             <button class="btn btn-outline">
                 <i class="far fa-bookmark"></i> Save Job
             </button>
@@ -318,37 +323,7 @@
     </div>
 </div>
 
-<script>
-    function applyForJob() {
-        const jobId = /*[[${job.jobId}]]*/ '1';
-        if (confirm('Are you sure you want to apply for this position?')) {
-            // You'll implement the apply functionality here
-            fetch('/student/apply/' + jobId, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            })
-            .then(response => {
-                if (response.ok) {
-                    alert('Application submitted successfully!');
-                    // Update UI to show applied status
-                } else {
-                    alert('Failed to submit application. Please try again.');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred. Please try again.');
-            });
-        }
-    }
 
-    function saveJob() {
-        const jobId = /*[[${job.jobId}]]*/ '1';
-        // Implement save job functionality
-        alert('Job saved to your favorites!');
-    }
-</script>
+
 </body>
 </html>

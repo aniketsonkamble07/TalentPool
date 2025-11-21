@@ -1,461 +1,972 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Placement Officer - Placement Cell</title>
+    <title>Register Officer - Placement Cell</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
         :root {
-            --primary: #2c3e50;
-            --secondary: #3498db;
-            --accent: #e74c3c;
-            --light: #ecf0f1;
-            --dark: #2c3e50;
-            --success: #2ecc71;
-        }
+    --primary: #2c3e50;
+    --secondary: #3498db;
+    --accent: #e74c3c;
+    --light: #ecf0f1;
+    --dark: #2c3e50;
+    --success: #2ecc71;
+    --warning: #f39c12;
+    --info: #17a2b8;
+    --purple: #9b59b6;
+    --teal: #1abc9c;
+    --gray-100: #f8f9fa;
+    --gray-200: #e9ecef;
+    --gray-300: #dee2e6;
+    --gray-600: #6c757d;
+    --gray-800: #343a40;
+    --shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
+    --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+    --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+    --shadow-xl: 0 20px 25px rgba(0,0,0,0.1);
+    --border-radius: 12px;
+    --border-radius-lg: 16px;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
 
-        body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
+/* Content Header - Enhanced */
+.content-header {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    padding: 2rem 2.5rem;
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-md);
+    margin-bottom: 2.5rem;
+    border-left: 6px solid var(--secondary);
+    position: relative;
+    overflow: hidden;
+}
 
-        .container {
-            width: 100%;
-            max-width: 500px;
-        }
+.content-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 120px;
+    height: 120px;
+    background: linear-gradient(135deg, rgba(52, 152, 219, 0.1) 0%, rgba(41, 128, 185, 0.05) 100%);
+    border-radius: 0 0 0 100%;
+}
 
-        .form-card {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-            overflow: hidden;
-        }
+.content-header h1 {
+    color: var(--dark);
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
+    font-size: 2.2rem;
+    background: linear-gradient(135deg, var(--dark) 0%, var(--primary) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    position: relative;
+}
 
-        .form-header {
-            background: linear-gradient(135deg, var(--primary) 0%, #34495e 100%);
-            color: white;
-            padding: 25px;
-            text-align: center;
-        }
+.content-header h1 i {
+    background: linear-gradient(135deg, var(--secondary), var(--info));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
 
-        .form-header h2 {
-            margin-bottom: 5px;
-        }
+.breadcrumb {
+    background: transparent;
+    padding: 0;
+    margin: 0;
+    font-size: 0.95rem;
+}
 
-        .form-header p {
-            opacity: 0.9;
-            font-size: 14px;
-        }
+.breadcrumb-item a {
+    color: var(--secondary);
+    text-decoration: none;
+    font-weight: 500;
+    transition: var(--transition);
+    position: relative;
+}
 
-        .form-body {
-            padding: 30px;
-        }
+.breadcrumb-item a:hover {
+    color: var(--primary);
+    transform: translateX(2px);
+}
 
-        .form-group {
-            margin-bottom: 20px;
-        }
+.breadcrumb-item.active {
+    color: var(--gray-600);
+    font-weight: 600;
+}
 
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: var(--dark);
-        }
+.breadcrumb-item + .breadcrumb-item::before {
+    color: var(--gray-300);
+    font-weight: bold;
+}
 
-        .form-group label.required::after {
-            content: " *";
-            color: var(--accent);
-        }
+/* Form Container - Enhanced */
+.form-container {
+    max-width: 650px;
+    margin: 0 auto;
+    animation: slideUp 0.6s ease-out;
+}
 
-        .input-group {
-            position: relative;
-        }
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
 
-        .input-group .icon {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #777;
-        }
+.form-card {
+    background: linear-gradient(135deg, #ffffff 0%, #fafbfc 100%);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-xl);
+    overflow: hidden;
+    margin-bottom: 2.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    position: relative;
+    transition: var(--transition-slow);
+}
 
-        .form-control {
-            width: 100%;
-            padding: 12px 15px 12px 45px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 16px;
-            transition: all 0.3s ease;
-        }
+.form-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+}
 
-        .form-control:focus {
-            border-color: var(--secondary);
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
-        }
+.form-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(135deg, var(--secondary), var(--info), var(--teal));
+    background-size: 200% 200%;
+    animation: gradientShift 3s ease infinite;
+}
 
-        .form-control.error {
-            border-color: var(--accent);
-        }
+@keyframes gradientShift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
 
-        select.form-control {
-            appearance: none;
-            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-            background-repeat: no-repeat;
-            background-position: right 15px center;
-            background-size: 16px;
-            padding-right: 40px;
-        }
+.form-header {
+    background: linear-gradient(135deg, var(--primary) 0%, #34495e 100%);
+    color: white;
+    padding: 2rem 2.5rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
 
-        .error-message {
-            color: var(--accent);
-            font-size: 14px;
-            margin-top: 5px;
-            display: none;
-        }
+.form-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: pulse 6s ease-in-out infinite;
+}
 
-        .text-danger {
-            color: var(--accent);
-            font-size: 14px;
-            margin-top: 5px;
-        }
+@keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+}
 
-        .photo-upload {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
+.form-header h2 {
+    margin-bottom: 0.5rem;
+    font-size: 1.8rem;
+    font-weight: 700;
+    position: relative;
+}
 
-        .photo-preview {
-            width: 80px;
-            height: 80px;
-            border-radius: 8px;
-            background-color: var(--light);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 2px dashed #ccc;
-            overflow: hidden;
-        }
+.form-header p {
+    opacity: 0.9;
+    font-size: 1rem;
+    margin: 0;
+    font-weight: 300;
+}
 
-        .photo-preview img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: none;
-        }
+.form-body {
+    padding: 2.5rem;
+}
 
-        .photo-preview i {
-            font-size: 24px;
-            color: #999;
-        }
+/* Form Elements - Enhanced */
+.form-group {
+    margin-bottom: 1.75rem;
+    position: relative;
+}
 
-        .upload-btn {
-            padding: 8px 16px;
-            background-color: var(--light);
-            color: var(--dark);
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.3s ease;
-        }
+.form-group label {
+    display: block;
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+    color: var(--dark);
+    font-size: 0.95rem;
+    transition: var(--transition);
+}
 
-        .upload-btn:hover {
-            background-color: #e0e0e0;
-        }
+.form-group label.required::after {
+    content: " *";
+    color: var(--accent);
+    font-weight: bold;
+}
 
-        .form-actions {
-            display: flex;
-            gap: 15px;
-            margin-top: 30px;
-        }
+.form-group:focus-within label {
+    color: var(--secondary);
+    transform: translateX(5px);
+}
 
-        .btn {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-align: center;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
+.input-group {
+    position: relative;
+}
 
-        .btn-primary {
-            background-color: var(--secondary);
-            color: white;
-        }
+.input-group .icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gray-600);
+    z-index: 10;
+    transition: var(--transition);
+    font-size: 1.1rem;
+}
 
-        .btn-primary:hover {
-            background-color: var(--primary);
-            transform: translateY(-2px);
-        }
+.form-group:focus-within .icon {
+    color: var(--secondary);
+    transform: translateY(-50%) scale(1.1);
+}
 
-        .btn-outline {
-            background-color: transparent;
-            border: 2px solid var(--secondary);
-            color: var(--secondary);
-        }
+.form-control {
+    width: 100%;
+    padding: 1rem 1rem 1rem 3rem;
+    border: 2px solid var(--gray-200);
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    transition: var(--transition);
+    background: linear-gradient(135deg, #ffffff 0%, #fafbfc 100%);
+    font-weight: 500;
+}
 
-        .btn-outline:hover {
-            background-color: var(--secondary);
-            color: white;
-        }
+.form-control:focus {
+    border-color: var(--secondary);
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.1);
+    background: #ffffff;
+    transform: translateY(-2px);
+}
 
-        .success-message {
-            text-align: center;
-            padding: 40px 20px;
-            display: none;
-        }
+.form-control:hover {
+    border-color: var(--gray-300);
+}
 
-        .success-message i {
-            font-size: 48px;
-            color: var(--success);
-            margin-bottom: 15px;
-        }
+.form-control.error {
+    border-color: var(--accent);
+    background: linear-gradient(135deg, #fff5f5 0%, #ffeaea 100%);
+}
 
-        .back-link {
-            text-align: center;
-            margin-top: 20px;
-        }
+select.form-control {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%233498db' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 16px;
+    padding-right: 3rem;
+    cursor: pointer;
+}
 
-        .back-link a {
-            color: white;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            transition: opacity 0.3s ease;
-        }
+/* Validation Styles - Enhanced */
+.error-message {
+    color: var(--accent);
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+    display: none;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    background: linear-gradient(135deg, #fee 0%, #fff5f5 100%);
+    border-radius: var(--border-radius);
+    border-left: 4px solid var(--accent);
+    animation: shake 0.5s ease-in-out;
+}
 
-        .back-link a:hover {
-            opacity: 0.8;
-        }
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
 
-        .alert {
-            padding: 12px 15px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
+.text-danger {
+    color: var(--accent);
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
 
-        .alert-success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
+.text-danger::before {
+    content: '⚠';
+    font-size: 1rem;
+}
 
-        .alert-danger {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
+/* Photo Upload - Enhanced */
+.photo-upload {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, var(--gray-100) 0%, var(--gray-200) 100%);
+    border-radius: var(--border-radius);
+    border: 2px dashed var(--gray-300);
+    transition: var(--transition);
+}
 
-        @media (max-width: 480px) {
-            .form-body {
-                padding: 20px;
-            }
+.photo-upload:hover {
+    border-color: var(--secondary);
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+    transform: translateY(-2px);
+}
 
-            .form-actions {
-                flex-direction: column;
-            }
+.photo-upload.dragover {
+    border-color: var(--success);
+    background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%);
+    transform: scale(1.02);
+}
 
-            .photo-upload {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-        }
+.photo-preview {
+    width: 100px;
+    height: 100px;
+    border-radius: var(--border-radius);
+    background: linear-gradient(135deg, #ffffff 0%, var(--gray-100) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px dashed var(--gray-400);
+    overflow: hidden;
+    transition: var(--transition);
+    position: relative;
+}
+
+.photo-preview:hover {
+    border-color: var(--secondary);
+    transform: scale(1.05);
+}
+
+.photo-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: none;
+    border-radius: var(--border-radius);
+}
+
+.photo-preview i {
+    font-size: 2rem;
+    color: var(--gray-500);
+    transition: var(--transition);
+}
+
+.photo-preview:hover i {
+    color: var(--secondary);
+    transform: scale(1.1);
+}
+
+.upload-btn {
+    padding: 0.75rem 1.5rem;
+    background: linear-gradient(135deg, var(--secondary) 0%, #2980b9 100%);
+    color: white;
+    border: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.upload-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    background: linear-gradient(135deg, #2980b9 0%, var(--secondary) 100%);
+}
+
+/* Checkbox Styling - Enhanced */
+.form-group input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    margin-right: 0.75rem;
+    accent-color: var(--secondary);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.form-group input[type="checkbox"]:hover {
+    transform: scale(1.1);
+}
+
+.form-group label[for="isActive"] {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-weight: 600;
+    padding: 0.75rem 1rem;
+    background: linear-gradient(135deg, var(--gray-100) 0%, var(--gray-200) 100%);
+    border-radius: var(--border-radius);
+    transition: var(--transition);
+}
+
+.form-group label[for="isActive"]:hover {
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+    transform: translateX(5px);
+}
+
+/* Form Actions - Enhanced */
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2.5rem;
+    padding-top: 2rem;
+    border-top: 2px solid var(--gray-200);
+}
+
+.btn-custom {
+    flex: 1;
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition);
+    text-align: center;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-custom::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    transition: var(--transition-slow);
+}
+
+.btn-custom:hover::before {
+    left: 100%;
+}
+
+.btn-primary-custom {
+    background: linear-gradient(135deg, var(--secondary) 0%, var(--info) 100%);
+    color: white;
+    border: none;
+    box-shadow: var(--shadow-md);
+}
+
+.btn-primary-custom:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+    background: linear-gradient(135deg, var(--info) 0%, var(--secondary) 100%);
+}
+
+.btn-outline-custom {
+    background: transparent;
+    border: 2px solid var(--secondary);
+    color: var(--secondary);
+    font-weight: 700;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-outline-custom::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, var(--secondary) 0%, var(--info) 100%);
+    transition: var(--transition);
+    z-index: -1;
+}
+
+.btn-outline-custom:hover {
+    color: white;
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-outline-custom:hover::before {
+    left: 0;
+}
+
+/* Success Message - Enhanced */
+.success-message {
+    text-align: center;
+    padding: 3rem 2rem;
+    display: none;
+    background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%);
+    border-radius: var(--border-radius-lg);
+    border: 2px solid var(--success);
+    position: relative;
+    overflow: hidden;
+}
+
+.success-message::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(46, 204, 113, 0.1) 0%, transparent 70%);
+    animation: successPulse 2s ease-in-out infinite;
+}
+
+@keyframes successPulse {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.2); opacity: 0.8; }
+}
+
+.success-message i {
+    font-size: 4rem;
+    color: var(--success);
+    margin-bottom: 1.5rem;
+    animation: bounce 1s ease-in-out;
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+    40% { transform: translateY(-10px); }
+    60% { transform: translateY(-5px); }
+}
+
+.success-message h3 {
+    color: var(--dark);
+    margin-bottom: 1rem;
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+
+.success-message p {
+    color: var(--gray-600);
+    margin-bottom: 2rem;
+    font-size: 1.1rem;
+    line-height: 1.6;
+}
+
+/* Alerts - Enhanced */
+.alert {
+    padding: 1rem 1.5rem;
+    border-radius: var(--border-radius);
+    margin-bottom: 2rem;
+    text-align: center;
+    font-weight: 600;
+    border: none;
+    box-shadow: var(--shadow-sm);
+    position: relative;
+    overflow: hidden;
+}
+
+.alert::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+}
+
+.alert-success {
+    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+    color: #155724;
+}
+
+.alert-success::before {
+    background: var(--success);
+}
+
+.alert-danger {
+    background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+    color: #721c24;
+}
+
+.alert-danger::before {
+    background: var(--accent);
+}
+
+/* Responsive Design - Enhanced */
+@media (max-width: 768px) {
+    .content-header {
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .content-header h1 {
+        font-size: 1.8rem;
+    }
+
+    .form-body {
+        padding: 1.5rem;
+    }
+
+    .form-actions {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .photo-upload {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 1rem;
+    }
+
+    .btn-custom {
+        padding: 0.875rem 1.5rem;
+    }
+
+    .form-header {
+        padding: 1.5rem;
+    }
+
+    .form-header h2 {
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .form-container {
+        margin: 0 0.5rem;
+    }
+
+    .form-body {
+        padding: 1rem;
+    }
+
+    .content-header {
+        padding: 1rem 1.25rem;
+    }
+
+    .content-header h1 {
+        font-size: 1.5rem;
+    }
+
+    .content-header .row {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+
+    .content-header .text-end {
+        text-align: center !important;
+    }
+
+    .breadcrumb {
+        justify-content: center;
+    }
+}
+
+/* Focus states for accessibility */
+.form-control:focus-visible {
+    outline: 3px solid var(--secondary);
+    outline-offset: 2px;
+}
+
+.btn-custom:focus-visible {
+    outline: 3px solid var(--secondary);
+    outline-offset: 2px;
+}
+
+/* Loading state for form submission */
+.form-loading {
+    opacity: 0.7;
+    pointer-events: none;
+    position: relative;
+}
+
+.form-loading::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
+    animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+.form-loading .btn-custom::after {
+    content: '';
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    border: 2px solid transparent;
+    border-top: 2px solid currentColor;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-left: 0.5rem;
+}
+
+/* Floating label effect */
+.form-group.floating-label {
+    position: relative;
+}
+
+.form-group.floating-label label {
+    position: absolute;
+    top: 1rem;
+    left: 3rem;
+    background: white;
+    padding: 0 0.5rem;
+    transition: var(--transition);
+    pointer-events: none;
+}
+
+.form-group.floating-label .form-control:focus + label,
+.form-group.floating-label .form-control:not(:placeholder-shown) + label {
+    top: -0.5rem;
+    left: 1rem;
+    font-size: 0.8rem;
+    color: var(--secondary);
+    font-weight: 700;
+}
+
+/* Character counter */
+.char-counter {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.75rem;
+    color: var(--gray-600);
+    background: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 10px;
+    font-weight: 600;
+}
+
+.char-counter.warning {
+    color: var(--warning);
+}
+
+.char-counter.danger {
+    color: var(--accent);
+}
     </style>
 </head>
 <body>
-<div class="container">
-    <div class="form-card">
-        <div class="form-header">
-            <h2>Add Placement Officer</h2>
-            <p>Register a new placement officer</p>
+<div layout:fragment="content">
+    <!-- Header -->
+    <div class="content-header">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <h1><i class="fas fa-user-plus me-3"></i>Register New Officer</h1>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a th:href="@{/admin/dashboard}">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a th:href="@{/admin/officers/list}">Officers</a></li>
+                        <li class="breadcrumb-item active">Register</li>
+                    </ol>
+                </nav>
+            </div>
+            <div class="col-md-6 text-end">
+                <a th:href="@{/admin/officers/list}" class="btn btn-outline-custom">
+                    <i class="fas fa-arrow-left me-2"></i> Back to List
+                </a>
+            </div>
         </div>
+    </div>
 
-        <div class="form-body">
-            <!-- Success/Error Messages -->
-            <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
-            <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+    <div class="form-container">
+        <div class="form-card">
+            <div class="form-header">
+                <h2>Add Placement Officer</h2>
+                <p>Register a new placement officer</p>
+            </div>
 
-            <form th:action="@{/admin/registerOfficer}" th:object="${placementOfficerRequestDTO}" method="post" id="officerForm">
-                <!-- Name -->
-                <div class="form-group">
-                    <label for="name" class="required">Full Name</label>
-                    <div class="input-group">
-                        <div class="icon">
-                            <i class="fas fa-user"></i>
+            <div class="form-body">
+                <!-- Success/Error Messages -->
+                <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+                <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+                <form th:action="@{/admin/officers/register}" th:object="${placementOfficerRequestDTO}" method="post" id="officerForm">
+                    <!-- Name -->
+                    <div class="form-group">
+                        <label for="name" class="required">Full Name</label>
+                        <div class="input-group">
+                            <div class="icon">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <input type="text" id="name" class="form-control" th:field="*{name}"
+                                   placeholder="Enter full name" required maxlength="100">
                         </div>
-                        <input type="text" id="name" class="form-control" th:field="*{name}"
-                               placeholder="Enter full name" required maxlength="100">
-                    </div>
-                    <div th:if="${#fields.hasErrors('name')}" class="text-danger">
-                        <small th:errors="*{name}"></small>
-                    </div>
-                    <div class="error-message" id="nameError">Please enter a valid name</div>
-                </div>
-
-                <!-- Position -->
-                <div class="form-group">
-                    <label for="position" class="required">Position</label>
-                    <div class="input-group">
-                        <div class="icon">
-                            <i class="fas fa-briefcase"></i>
+                        <div th:if="${#fields.hasErrors('name')}" class="text-danger">
+                            <small th:errors="*{name}"></small>
                         </div>
-                        <input type="text" id="position" class="form-control" th:field="*{position}"
-                               placeholder="Enter position" required maxlength="100">
+                        <div class="error-message" id="nameError">Please enter a valid name</div>
                     </div>
-                    <div th:if="${#fields.hasErrors('position')}" class="text-danger">
-                        <small th:errors="*{position}"></small>
-                    </div>
-                    <div class="error-message" id="positionError">Please enter a position</div>
-                </div>
 
-                <!-- Email -->
-                <div class="form-group">
-                    <label for="email" class="required">Email Address</label>
-                    <div class="input-group">
-                        <div class="icon">
-                            <i class="fas fa-envelope"></i>
+                    <!-- Position -->
+                    <div class="form-group">
+                        <label for="position" class="required">Position</label>
+                        <div class="input-group">
+                            <div class="icon">
+                                <i class="fas fa-briefcase"></i>
+                            </div>
+                            <input type="text" id="position" class="form-control" th:field="*{position}"
+                                   placeholder="Enter position" required maxlength="100">
                         </div>
-                        <input type="email" id="email" class="form-control" th:field="*{email}"
-                               placeholder="Enter email address" required maxlength="100">
-                    </div>
-                    <div th:if="${#fields.hasErrors('email')}" class="text-danger">
-                        <small th:errors="*{email}"></small>
-                    </div>
-                    <div class="error-message" id="emailError">Please enter a valid email address</div>
-                </div>
-
-                <!-- Password -->
-                <div class="form-group">
-                    <label for="password" class="required">Password</label>
-                    <div class="input-group">
-                        <div class="icon">
-                            <i class="fas fa-lock"></i>
+                        <div th:if="${#fields.hasErrors('position')}" class="text-danger">
+                            <small th:errors="*{position}"></small>
                         </div>
-                        <input type="password" id="password" class="form-control" th:field="*{password}"
-                               placeholder="Enter password" required>
+                        <div class="error-message" id="positionError">Please enter a position</div>
                     </div>
-                    <div th:if="${#fields.hasErrors('password')}" class="text-danger">
-                        <small th:errors="*{password}"></small>
-                    </div>
-                    <div class="error-message" id="passwordError">Please enter a password</div>
-                </div>
 
-                <!-- Mobile Number -->
-                <div class="form-group">
-                    <label for="mobileNumber" class="required">Mobile Number</label>
-                    <div class="input-group">
-                        <div class="icon">
-                            <i class="fas fa-phone"></i>
+                    <!-- Email -->
+                    <div class="form-group">
+                        <label for="email" class="required">Email Address</label>
+                        <div class="input-group">
+                            <div class="icon">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <input type="email" id="email" class="form-control" th:field="*{email}"
+                                   placeholder="Enter email address" required maxlength="100">
                         </div>
-                        <input type="tel" id="mobileNumber" class="form-control" th:field="*{mobileNumber}"
-                               placeholder="Enter 10-digit mobile number" required pattern="[0-9]{10}" maxlength="10">
-                    </div>
-                    <div th:if="${#fields.hasErrors('mobileNumber')}" class="text-danger">
-                        <small th:errors="*{mobileNumber}"></small>
-                    </div>
-                    <div class="error-message" id="mobileError">Please enter a valid 10-digit mobile number</div>
-                </div>
-
-                <!-- Role -->
-                <div class="form-group">
-                    <label for="role" class="required">Role</label>
-                    <select id="role" class="form-control" th:field="*{role}" required>
-                        <option value="">Select Role</option>
-                        <option value="HEAD_PLACEMENT">Head Placement Officer</option>
-                        <option value="PLACEMENT_OFFICER">Placement Officer</option>
-                        <option value="INDUSTRY_RELATIONS_MANAGER">Industry Relations Manager</option>
-                        <option value="STUDENT_COORDINATOR">Student Coordinator</option>
-                        <option value="JOB_COORDINATOR">Job Coordinator</option>
-                    </select>
-                    <div th:if="${#fields.hasErrors('role')}" class="text-danger">
-                        <small th:errors="*{role}"></small>
-                    </div>
-                    <div class="error-message" id="roleError">Please select a role</div>
-                </div>
-
-                <!-- Photo Upload -->
-                <div class="form-group">
-                    <label>Photo</label>
-                    <div class="photo-upload">
-                        <div class="photo-preview" id="photoPreview">
-                            <i class="fas fa-user-tie"></i>
-                            <img id="previewImage" src="" alt="Preview">
+                        <div th:if="${#fields.hasErrors('email')}" class="text-danger">
+                            <small th:errors="*{email}"></small>
                         </div>
-                        <div>
-                            <input type="file" id="photoUpload" accept="image/*" style="display: none;">
-                            <button type="button" class="upload-btn" onclick="document.getElementById('photoUpload').click()">
-                                <i class="fas fa-upload"></i> Upload Photo
-                            </button>
+                        <div class="error-message" id="emailError">Please enter a valid email address</div>
+                    </div>
+
+                    <!-- Password -->
+                    <div class="form-group">
+                        <label for="password" class="required">Password</label>
+                        <div class="input-group">
+                            <div class="icon">
+                                <i class="fas fa-lock"></i>
+                            </div>
+                            <input type="password" id="password" class="form-control" th:field="*{password}"
+                                   placeholder="Enter password" required>
+                        </div>
+                        <div th:if="${#fields.hasErrors('password')}" class="text-danger">
+                            <small th:errors="*{password}"></small>
+                        </div>
+                        <div class="error-message" id="passwordError">Please enter a password</div>
+                    </div>
+
+                    <!-- Mobile Number -->
+                    <div class="form-group">
+                        <label for="mobileNumber" class="required">Mobile Number</label>
+                        <div class="input-group">
+                            <div class="icon">
+                                <i class="fas fa-phone"></i>
+                            </div>
+                            <input type="tel" id="mobileNumber" class="form-control" th:field="*{mobileNumber}"
+                                   placeholder="Enter 10-digit mobile number" required pattern="[0-9]{10}" maxlength="10">
+                        </div>
+                        <div th:if="${#fields.hasErrors('mobileNumber')}" class="text-danger">
+                            <small th:errors="*{mobileNumber}"></small>
+                        </div>
+                        <div class="error-message" id="mobileError">Please enter a valid 10-digit mobile number</div>
+                    </div>
+
+                    <!-- Role -->
+                    <div class="form-group">
+                        <label for="role" class="required">Role</label>
+                        <select id="role" class="form-control" th:field="*{role}" required>
+                            <option value="">Select Role</option>
+                            <option value="HEAD_PLACEMENT">Head Placement Officer</option>
+                            <option value="PLACEMENT_OFFICER">Placement Officer</option>
+                            <option value="INDUSTRY_RELATIONS_MANAGER">Industry Relations Manager</option>
+                            <option value="STUDENT_COORDINATOR">Student Coordinator</option>
+                            <option value="JOB_COORDINATOR">Job Coordinator</option>
+                        </select>
+                        <div th:if="${#fields.hasErrors('role')}" class="text-danger">
+                            <small th:errors="*{role}"></small>
+                        </div>
+                        <div class="error-message" id="roleError">Please select a role</div>
+                    </div>
+
+                    <!-- Photo Upload -->
+                    <div class="form-group">
+                        <label>Photo</label>
+                        <div class="photo-upload">
+                            <div class="photo-preview" id="photoPreview">
+                                <i class="fas fa-user-tie"></i>
+                                <img id="previewImage" src="" alt="Preview">
+                            </div>
+                            <div>
+                                <input type="file" id="photoUpload" accept="image/*" style="display: none;">
+                                <button type="button" class="upload-btn" onclick="document.getElementById('photoUpload').click()">
+                                    <i class="fas fa-upload"></i> Upload Photo
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Active Status -->
-                <div class="form-group">
-                    <label style="display: flex; align-items: center; gap: 8px;">
-                        <input type="checkbox" id="isActive" th:field="*{active}" checked>
-                        Active Officer
-                    </label>
-                </div>
+                    <!-- Active Status -->
+                    <div class="form-group">
+                        <label style="display: flex; align-items: center; gap: 8px;">
+                            <input type="checkbox" id="isActive" th:field="*{active}" checked>
+                            Active Officer
+                        </label>
+                    </div>
 
-                <!-- Form Actions -->
-                <div class="form-actions">
-                    <a th:href="@{/admin/dashboard}" class="btn btn-outline">
-                        <i class="fas fa-arrow-left"></i> Back
-                    </a>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-user-plus"></i> Create Officer
-                    </button>
-                </div>
-            </form>
+                    <!-- Form Actions -->
+                    <div class="form-actions">
+                        <a th:href="@{/admin/officers/list}" class="btn-custom btn-outline-custom">
+                            <i class="fas fa-times"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn-custom btn-primary-custom">
+                            <i class="fas fa-user-plus"></i> Create Officer
+                        </button>
+                    </div>
+                </form>
 
-            <!-- Success Message (Hidden by default) -->
-            <div class="success-message" id="successMessage">
-                <i class="fas fa-check-circle"></i>
-                <h3>Officer Created Successfully!</h3>
-                <p>The placement officer has been registered successfully.</p>
-                <div class="form-actions" style="margin-top: 20px;">
-                    <button type="button" class="btn btn-outline" onclick="addAnother()">
-                        <i class="fas fa-plus"></i> Add Another
-                    </button>
-                    <a th:href="@{/admin/dashboard}" class="btn btn-primary">
-                        <i class="fas fa-tachometer-alt"></i> Back to Dashboard
-                    </a>
+                <!-- Success Message (Hidden by default) -->
+                <div class="success-message" id="successMessage">
+                    <i class="fas fa-check-circle"></i>
+                    <h3>Officer Created Successfully!</h3>
+                    <p>The placement officer has been registered successfully.</p>
+                    <div class="form-actions" style="margin-top: 20px;">
+                        <button type="button" class="btn-custom btn-outline-custom" onclick="addAnother()">
+                            <i class="fas fa-plus"></i> Add Another
+                        </button>
+                        <a th:href="@{/admin/officers/list}" class="btn-custom btn-primary-custom">
+                            <i class="fas fa-list"></i> View Officers
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
-
-<div class="back-link">
-    <a th:href="@{/admin/dashboard}">
-        <i class="fas fa-tachometer-alt"></i> Back to Dashboard
-    </a>
 </div>
 
 <script>
@@ -468,7 +979,7 @@
         if (serverErrors.length > 0) {
             serverErrors.forEach(error => {
                 if (error.textContent.trim() !== '') {
-                    const fieldId = error.previousElementSquerySelector('input, select')?.id;
+                    const fieldId = error.previousElementSibling?.querySelector('input, select')?.id;
                     if (fieldId) {
                         showError(fieldId, error.textContent);
                     }
@@ -504,7 +1015,6 @@
             if (!validateForm()) {
                 e.preventDefault();
             }
-            // Let the form submit normally if validation passes
         });
 
         // Real-time validation
