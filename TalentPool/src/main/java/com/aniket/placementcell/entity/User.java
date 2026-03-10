@@ -1,16 +1,14 @@
 package com.aniket.placementcell.entity;
 
 import com.aniket.placementcell.enums.Role;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 @Entity
 @Getter
 @Setter
+@Table(name = "users")
 public class User {
     @Id
     private String username; // Use email as username

@@ -4,14 +4,21 @@ import com.aniket.placementcell.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.security.web.context.SecurityContextRepository;
 
 @Configuration
 @RequiredArgsConstructor
@@ -19,13 +26,19 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthFilter;
 
-    // ✅ Used by Spring automatically (ignore warning)
+    // ✅ Required because controller uses it
+    @Bean
+    public SecurityContextRepository securityContextRepository() {
+        return new HttpSessionSecurityContextRepository();
+    }
+
+    // ✅ Password encoder used by Spring automatically
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    // ✅ Used internally by Spring (ignore warning)
+    // ✅ Authentication manager used internally by Spring
     @Bean
     public AuthenticationManager authenticationManager(
             AuthenticationConfiguration config
@@ -33,13 +46,19 @@ public class SecurityConfig {
         return config.getAuthenticationManager();
     }
 
-    // ✅ Main security config (used by Spring, ignore warning)
+    // ✅ Main security configuration
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http)
             throws Exception {
 
         http
                 .csrf(csrf -> csrf.disable())
+
+                .securityContext(context ->
+                        context.securityContextRepository(
+                                securityContextRepository()
+                        )
+                )
 
                 .authorizeHttpRequests(auth -> auth
 
@@ -59,13 +78,11 @@ public class SecurityConfig {
                                 "/favicon.ico"
                         ).permitAll()
 
-                        .requestMatchers(
-                                "/student/**"
-                        ).hasRole("STUDENT")
+                        .requestMatchers("/student/**")
+                        .hasRole("STUDENT")
 
-                        .requestMatchers(
-                                "/admin/**"
-                        ).hasRole("PLACEMENT_OFFICER")
+                        .requestMatchers("/admin/**")
+                        .hasRole("PLACEMENT_OFFICER")
 
                         .anyRequest().authenticated()
                 )

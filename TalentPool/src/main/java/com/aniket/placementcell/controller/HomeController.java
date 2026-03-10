@@ -5,9 +5,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 public class HomeController {
+
+    //  Fix for root path error
+    @GetMapping("/")
+    public String root() {
+        return "redirect:/home";
+    }
+
     @GetMapping("/home")
-    public String StudentHomePage()
-    {
+    public String studentHomePage() {
         return "home";
     }
 }
